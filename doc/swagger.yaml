@@ -1,0 +1,268 @@
+---
+swagger: "2.0"
+info:
+  description: ""
+  version: "1.0.0"
+  title: "DBqueryBench"
+  termsOfService: "http://swagger.io/terms/"
+  contact:
+    email: "apiteam@swagger.io"
+  license:
+    name: "Apache 2.0"
+    url: "http://www.apache.org/licenses/LICENSE-2.0.html"
+host: "dbqueryBench"
+basePath: "/v1"
+tags:
+- name: "query"
+  description: "Everything for your queries"
+- name: "user"
+  description: "Operations about user"
+schemes:
+- "https"
+paths:
+  /query:
+    post:
+      tags:
+      - "query"
+      summary: "Add a new query to the queue"
+      description: ""
+      operationId: "addQuery"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Query that needs to be queued"
+        required: true
+        schema:
+          $ref: "#/definitions/Query"
+        x-exportParamName: "Body"
+      responses:
+        405:
+          description: "Invalid input"
+    put:
+      tags:
+      - "query"
+      summary: "Update an existing query"
+      description: ""
+      operationId: "updateQuery"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Query that needs to be updated"
+        required: true
+        schema:
+          $ref: "#/definitions/Query"
+        x-exportParamName: "Body"
+      responses:
+        400:
+          description: "Invalid ID supplied"
+        404:
+          description: "Query not found"
+        405:
+          description: "Validation exception"
+  /query/findByStatus:
+    get:
+      tags:
+      - "query"
+      summary: "Finds Query by status"
+      description: "Multiple status values can be provided with comma separated strings"
+      operationId: "findQueryByStatus"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "status"
+        in: "query"
+        description: "Status values that need to be considered for filter"
+        required: true
+        type: "array"
+        items:
+          type: "string"
+          default: "pending"
+          enum:
+          - "done"
+          - "pending"
+          - "approved"
+          - "failed"
+          - "running"
+        collectionFormat: "multi"
+        x-exportParamName: "Status"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Query"
+        400:
+          description: "Invalid status value"
+  /query/findByOwner:
+    get:
+      tags:
+      - "query"
+      summary: "Finds Query by Owner"
+      description: "Muliple tags can be provided with comma separated strings. Use\
+        \ tag1, tag2, tag3 for testing."
+      operationId: "findQueryByOwner"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "owner"
+        in: "query"
+        description: "Owner to filter by"
+        required: true
+        type: "array"
+        items:
+          type: "string"
+        collectionFormat: "multi"
+        x-exportParamName: "Owner"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Query"
+        400:
+          description: "Invalid tag value"
+  /query/{queryId}:
+    get:
+      tags:
+      - "query"
+      summary: "Find query by ID"
+      description: "Returns a single query"
+      operationId: "getQueryById"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "queryId"
+        in: "path"
+        description: "ID of query to return"
+        required: true
+        type: "integer"
+        format: "int64"
+        x-exportParamName: "QueryId"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/Query"
+        400:
+          description: "Invalid ID supplied"
+        404:
+          description: "Query not found"
+  /query/approve/{queryId}:
+    post:
+      tags:
+      - "query"
+      summary: "Approve a query in the queue"
+      description: ""
+      operationId: "approveQuery"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "queryId"
+        in: "path"
+        description: "ID of query that needs to be updated"
+        required: true
+        type: "integer"
+        format: "int64"
+        x-exportParamName: "QueryId"
+      - in: "body"
+        name: "status"
+        description: "Updated status of the query"
+        required: true
+        schema:
+          type: "string"
+          enum:
+          - "done"
+          - "pending"
+          - "approved"
+          - "failed"
+          - "running"
+          default: "pending"
+        x-exportParamName: "Status"
+      responses:
+        405:
+          description: "Invalid input"
+    delete:
+      tags:
+      - "query"
+      summary: "Deletes a query"
+      description: ""
+      operationId: "deleteQuery"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "queryId"
+        in: "path"
+        description: "Query id to delete"
+        required: true
+        type: "integer"
+        format: "int64"
+        x-exportParamName: "QueryId"
+      responses:
+        400:
+          description: "Invalid ID supplied"
+        404:
+          description: "Query not found"
+definitions:
+  User:
+    type: "object"
+    required:
+    - "name"
+    properties:
+      name:
+        type: "string"
+  Query:
+    type: "object"
+    required:
+    - "ticketid"
+    - "query"
+    properties:
+      id:
+        type: "integer"
+        format: "int64"
+      ticketid:
+        type: "string"
+      approvals:
+        type: "array"
+        items:
+          $ref: "#/definitions/User"
+      owner:
+        $ref: "#/definitions/User"
+      query:
+        type: "string"
+      hasselect:
+        type: "boolean"
+      hasdelete:
+        type: "boolean"
+      hasinsert:
+        type: "boolean"
+      hasupdate:
+        type: "boolean"
+      hastransaction:
+        type: "boolean"
+      status:
+        type: "string"
+        description: "query status in the store"
+        enum:
+        - "done"
+        - "pending"
+        - "approved"
+        - "running"
+        - "failed"
+    example:
+      query: "SELECT * from xtable;"
+      ticketid: "BLAH-3233"
+      owner: "owner@eamil.com"
+      status: "pending"
+      id: 0
