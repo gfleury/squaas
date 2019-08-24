@@ -35,6 +35,8 @@ type Query struct {
 
 	HasUpdate bool `json:"hasupdate,omitempty" bson:"hasupdate"`
 
+	HasAlter bool `json:"hasalter,omitempty" bson:"hasalter"`
+
 	HasTransaction bool `json:"hastransaction,omitempty" bson:"hastransaction"`
 }
 

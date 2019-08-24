@@ -14,13 +14,13 @@
  *
  */
 
-(function(root, factory) {
+(function (root, factory) {
   if (typeof define === 'function' && define.amd) {
     // AMD. Register as an anonymous module.
-    define(['ApiClient', 'model/User'], factory);
+    define(['../ApiClient', '../model/User'], factory);
   } else if (typeof module === 'object' && module.exports) {
     // CommonJS-like environments that support module.exports, like Node.
-    module.exports = factory(require('../ApiClient'), require('./User'));
+    module.exports = factory(require('ApiClient'), require('User'));
   } else {
     // Browser globals (root is window)
     if (!root.DBqueryBench) {
@@ -28,7 +28,7 @@
     }
     root.DBqueryBench.Query = factory(root.DBqueryBench.ApiClient, root.DBqueryBench.User);
   }
-}(this, function(ApiClient, User) {
+}(this, function (ApiClient, User) {
   'use strict';
 
 
@@ -47,7 +47,7 @@
    * @param ticketid {String} 
    * @param query {String} 
    */
-  var exports = function(ticketid, query) {
+  var exports = function (ticketid, query) {
     var _this = this;
 
 
@@ -70,7 +70,7 @@
    * @param {module:model/Query} obj Optional instance to populate.
    * @return {module:model/Query} The populated <code>Query</code> instance.
    */
-  exports.constructFromObject = function(data, obj) {
+  exports.constructFromObject = function (data, obj) {
     if (data) {
       obj = obj || new exports();
 
@@ -188,7 +188,8 @@
      * value: "failed"
      * @const
      */
-    "failed": "failed"  };
+    "failed": "failed"
+  };
 
 
   return exports;

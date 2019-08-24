@@ -5,6 +5,7 @@
 package main
 
 import (
+	"github.com/gfleury/dbquerybench/config"
 	"log"
 	"net/http"
 
@@ -15,6 +16,7 @@ import (
 )
 
 func main() {
+	config.Init()
 	db.InitStorage()
 	err := db.DBStorage.Init()
 	if err != nil {

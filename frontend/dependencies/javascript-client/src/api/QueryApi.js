@@ -14,13 +14,13 @@
  *
  */
 
-(function(root, factory) {
+(function (root, factory) {
   if (typeof define === 'function' && define.amd) {
     // AMD. Register as an anonymous module.
-    define(['ApiClient', 'model/Query'], factory);
+    define(['../ApiClient', '../model/Query'], factory);
   } else if (typeof module === 'object' && module.exports) {
     // CommonJS-like environments that support module.exports, like Node.
-    module.exports = factory(require('../ApiClient'), require('../model/Query'));
+    module.exports = factory(require('ApiClient'), require('model/Query'));
   } else {
     // Browser globals (root is window)
     if (!root.DBqueryBench) {
@@ -28,7 +28,7 @@
     }
     root.DBqueryBench.QueryApi = factory(root.DBqueryBench.ApiClient, root.DBqueryBench.Query);
   }
-}(this, function(ApiClient, Query) {
+}(this, function (ApiClient, Query) {
   'use strict';
 
   /**
@@ -44,7 +44,7 @@
    * @param {module:ApiClient} [apiClient] Optional API client implementation to use,
    * default to {@link module:ApiClient#instance} if unspecified.
    */
-  var exports = function(apiClient) {
+  var exports = function (apiClient) {
     this.apiClient = apiClient || ApiClient.instance;
 
 
@@ -62,7 +62,7 @@
      * @param {module:model/Query} body Query that needs to be queued
      * @param {module:api/QueryApi~addQueryCallback} callback The callback function, accepting three arguments: error, data, response
      */
-    this.addQuery = function(body, callback) {
+    this.addQuery = function (body, callback) {
       var postBody = body;
 
       // verify the required parameter 'body' is set
@@ -109,7 +109,7 @@
      * @param {String} status Updated status of the query
      * @param {module:api/QueryApi~approveQueryCallback} callback The callback function, accepting three arguments: error, data, response
      */
-    this.approveQuery = function(queryId, status, callback) {
+    this.approveQuery = function (queryId, status, callback) {
       var postBody = status;
 
       // verify the required parameter 'queryId' is set
@@ -161,7 +161,7 @@
      * @param {Number} queryId Query id to delete
      * @param {module:api/QueryApi~deleteQueryCallback} callback The callback function, accepting three arguments: error, data, response
      */
-    this.deleteQuery = function(queryId, callback) {
+    this.deleteQuery = function (queryId, callback) {
       var postBody = null;
 
       // verify the required parameter 'queryId' is set
@@ -209,7 +209,7 @@
      * @param {module:api/QueryApi~findQueryByOwnerCallback} callback The callback function, accepting three arguments: error, data, response
      * data is of type: {@link Array.<module:model/Query>}
      */
-    this.findQueryByOwner = function(owner, callback) {
+    this.findQueryByOwner = function (owner, callback) {
       var postBody = null;
 
       // verify the required parameter 'owner' is set
@@ -260,7 +260,7 @@
      * @param {module:api/QueryApi~findQueryByStatusCallback} callback The callback function, accepting three arguments: error, data, response
      * data is of type: {@link Array.<module:model/Query>}
      */
-    this.findQueryByStatus = function(status, callback) {
+    this.findQueryByStatus = function (status, callback) {
       var postBody = null;
 
       // verify the required parameter 'status' is set
@@ -311,7 +311,7 @@
      * @param {module:api/QueryApi~getQueryByIdCallback} callback The callback function, accepting three arguments: error, data, response
      * data is of type: {@link module:model/Query}
      */
-    this.getQueryById = function(queryId, callback) {
+    this.getQueryById = function (queryId, callback) {
       var postBody = null;
 
       // verify the required parameter 'queryId' is set
@@ -358,7 +358,7 @@
      * @param {module:model/Query} body Query that needs to be updated
      * @param {module:api/QueryApi~updateQueryCallback} callback The callback function, accepting three arguments: error, data, response
      */
-    this.updateQuery = function(body, callback) {
+    this.updateQuery = function (body, callback) {
       var postBody = body;
 
       // verify the required parameter 'body' is set

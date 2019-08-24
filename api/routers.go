@@ -6,6 +6,7 @@ package api
 
 import (
 	"fmt"
+	"github.com/gfleury/dbquerybench/config"
 	"strings"
 
 	"github.com/gfleury/dbquerybench/auth"
@@ -22,9 +23,19 @@ type Route struct {
 type Routes []Route
 
 func NewRouter() *gin.Engine {
+	var baseAuth *gin.RouterGroup
+
 	m := gin.Default()
 
-	baseAuth := m.Group("/", auth.LdapBasicAuth())
+	authScheme := config.GetConfig().GetString("auth.scheme")
+
+	if authScheme == "" || authScheme == "config" {
+		baseAuth = m.Group("/", auth.ConfigBasicAuth())
+	} else if authScheme == "ldap" {
+		baseAuth = m.Group("/", auth.LdapBasicAuth())
+	}
+
+	baseAuth.Static("/frontend", "./frontend/build")
 
 	for _, route := range routes {
 		baseAuth.Handle(route.Method, route.Pattern, route.HandlerFunc)

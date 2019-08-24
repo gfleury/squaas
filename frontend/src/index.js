@@ -1,6 +1,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
+// Robot Font for MaterialUI
+import 'typeface-roboto';
 import App from './App';
 import * as serviceWorker from './serviceWorker';
 

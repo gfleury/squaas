@@ -1,1 +1,6 @@
-config: "nothing"
+auth:
+  scheme: config
+  config:
+    users:
+      admin: admin
+      test: test123

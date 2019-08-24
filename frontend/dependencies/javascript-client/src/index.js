@@ -14,15 +14,15 @@
  *
  */
 
-(function(factory) {
+(function (factory) {
   if (typeof define === 'function' && define.amd) {
     // AMD. Register as an anonymous module.
-    define(['ApiClient', 'model/Query', 'model/User', 'api/QueryApi'], factory);
+    define(['./ApiClient', './model/Query', './model/User', './api/QueryApi'], factory);
   } else if (typeof module === 'object' && module.exports) {
     // CommonJS-like environments that support module.exports, like Node.
-    module.exports = factory(require('./ApiClient'), require('./model/Query'), require('./model/User'), require('./api/QueryApi'));
+    module.exports = factory(require('ApiClient'), require('model/Query'), require('model/User'), require('api/QueryApi'));
   }
-}(function(ApiClient, Query, User, QueryApi) {
+}(function (ApiClient, Query, User, QueryApi) {
   'use strict';
 
   /**

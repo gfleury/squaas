@@ -1,25 +1,67 @@
 import React from 'react';
-import logo from './logo.svg';
+
+import { BrowserRouter as Router, Route, Link } from "react-router-dom";
+import Grid from '@material-ui/core/Grid';
+
+import Edit from "./QueryEdit"
+
+import List from "./QueryList"
+
 import './App.css';
 
 function App() {
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+      <Router basename="/frontend">
+        <Header />
+        <Route exact path="/" component={Home} />
+        <Route path="/about" component={About} />
+        <Route path="/queries" component={Queries} />
+        <Route
+          path="/queries/:id"
+          component={Edit} />
+        <Route
+          exact
+          path="/queries"
+          component={List}
+        />
+      </Router>
+    </div >
+  );
+}
+
+function Home() {
+  return <h2>Home</h2>;
+}
+
+function About() {
+  return <h2>About</h2>;
+}
+
+function Queries({ match }) {
+  return (
+    <Grid container spacing={3}>
+      <Grid item xs={12}>
+        <h2>Queries</h2>
+      </Grid>
+    </Grid>
+  );
+}
+
+function Header() {
+  return (
+    <Grid container spacing={3}>
+      <Grid item xs>
+        <Link to="/">Home</Link>
+      </Grid>
+      <Grid item xs>
+        <Link to="/about">About</Link>
+      </Grid>
+      <Grid item xs>
+        <Link to="/queries">Queries</Link>
+      </Grid>
+    </Grid>
   );
 }
 
