@@ -17,7 +17,8 @@ func (s *Suite) TestCreateQuery(c *check.C) {
 	query := &models.Query{
 		TicketID: "BLEH-330",
 		// Owner:    models.User{Name: "admin@boom.org"},
-		Query: "SELECT * FROM TABLE;",
+		Query:      "SELECT * FROM TABLE;",
+		ServerName: "db1.blah.com",
 	}
 
 	queryBytes, err := query.Byte()
@@ -39,8 +40,9 @@ func (s *Suite) TestCreateQuery(c *check.C) {
 	c.Assert(responseQuery.TicketID, check.Equals, query.TicketID)
 	c.Assert(responseQuery.Status, check.Equals, "pending")
 	c.Assert(responseQuery.Query, check.Equals, query.Query)
+	c.Assert(responseQuery.ServerName, check.Equals, query.ServerName)
 
-	// Check GetPipelineById
+	// Check GetQuery
 
 	req, _ = http.NewRequest("GET", fmt.Sprintf("/v1/query/%s", responseQuery.Id), nil)
 	response = s.executeRequest(req)

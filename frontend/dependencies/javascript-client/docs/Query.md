@@ -5,7 +5,7 @@ Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **id** | **Number** |  | [optional] 
 **ticketid** | **String** |  | 
-**approvals** | [**[User]**](User.md) |  | [optional] 
+**approvals** | [**[QueryApprovals]**](QueryApprovals.md) |  | [optional] 
 **owner** | [**User**](User.md) |  | [optional] 
 **query** | **String** |  | 
 **hasselect** | **Boolean** |  | [optional] 

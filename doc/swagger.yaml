@@ -236,10 +236,17 @@ definitions:
       approvals:
         type: "array"
         items:
-          $ref: "#/definitions/User"
+          type: "object"
+          properties:
+            user:
+              $ref: "#/definitions/User"
+            approve:
+              type: "boolean"
       owner:
         $ref: "#/definitions/User"
       query:
+        type: "string"
+      servername:
         type: "string"
       hasselect:
         type: "boolean"

@@ -14,6 +14,11 @@ import (
 	"github.com/zebresel-com/mongodm"
 )
 
+type Approvals struct {
+	User     *User `json:"user,omitempty" bson:"user"`
+	Approved bool  `json:"approved,omitempty" bson:"approved"`
+}
+
 type Query struct {
 	mongodm.DocumentBase `json:",inline" bson:",inline"`
 
@@ -21,11 +26,13 @@ type Query struct {
 
 	Owner User `json:"owner" bson:"owner"`
 
+	ServerName string `json:"servername" bson:"servername"`
+
 	Query string `json:"query" bson:"query"`
 
 	Status string `json:"status,omitempty" bson:"status"`
 
-	Approvals []*User `json:"approvals,omitempty" bson:"approvals"`
+	Approvals []Approvals `json:"approvals,omitempty" bson:"approvals"`
 
 	HasSelect bool `json:"hasselect,omitempty" bson:"hasselect"`
 
@@ -64,8 +71,8 @@ func (q *Query) Parse(bodyReader io.Reader) error {
 	return q.LintSQLQuery()
 }
 
-func (q *Query) AddApproval(u *User) {
-	q.Approvals = append(q.Approvals, u)
+func (q *Query) AddApproval(u *User, approve bool) {
+	q.Approvals = append(q.Approvals, Approvals{u, approve})
 }
 
 func (q *Query) LintSQLQuery() error {

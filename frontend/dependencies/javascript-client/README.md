@@ -129,6 +129,7 @@ Class | Method | HTTP request | Description
 ## Documentation for Models
 
  - [DBqueryBench.Query](docs/Query.md)
+ - [DBqueryBench.QueryApprovals](docs/QueryApprovals.md)
  - [DBqueryBench.User](docs/User.md)
 
 

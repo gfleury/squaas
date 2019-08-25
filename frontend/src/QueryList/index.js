@@ -1,5 +1,6 @@
 import React from 'react';
-import { BrowserRouter as Router, Route, Link } from "react-router-dom";
+/*eslint no-unused-vars: ["error", { "varsIgnorePattern": "Route" }]*/
+import { BrowserRouter as Route, Router, Link } from "react-router-dom";
 
 import { makeStyles } from '@material-ui/core/styles';
 import Table from '@material-ui/core/Table';

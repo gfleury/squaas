@@ -8,6 +8,12 @@ import Checkbox from '@material-ui/core/Checkbox';
 import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
 
+import InputLabel from '@material-ui/core/InputLabel';
+import MenuItem from '@material-ui/core/MenuItem';
+import FormHelperText from '@material-ui/core/FormHelperText';
+import FormControl from '@material-ui/core/FormControl';
+import Select from '@material-ui/core/Select';
+import Input from '@material-ui/core/Input';
 
 const useStyles = makeStyles(theme => ({
     container: {
@@ -24,6 +30,17 @@ const useStyles = makeStyles(theme => ({
     menu: {
         width: 200,
     },
+    root: {
+        display: 'flex',
+        flexWrap: 'wrap',
+    },
+    formControl: {
+        margin: theme.spacing(1),
+        minWidth: 120,
+    },
+    selectEmpty: {
+        marginTop: theme.spacing(2),
+    },
 }));
 
 export default function OutlinedTextFields({ match }) {
@@ -38,6 +55,13 @@ export default function OutlinedTextFields({ match }) {
     const handleChange = name => event => {
         setValues({ ...values, [name]: event.target.value });
     };
+
+    function xhandleChange(event) {
+        setValues(oldValues => ({
+            ...oldValues,
+            [event.target.name]: event.target.value,
+        }));
+    }
 
     return (
         <form className={classes.container} noValidate autoComplete="off">
@@ -89,7 +113,7 @@ export default function OutlinedTextFields({ match }) {
                     variant="outlined"
                 />
             </Grid>
-            <Grid item xs={12}>
+            <Grid item xs={9}>
                 <FormLabel component="legend">Query behaviors</FormLabel>
                 <FormControlLabel
                     value="Transaction"
@@ -139,6 +163,24 @@ export default function OutlinedTextFields({ match }) {
                     label="ALTER"
                     labelPlacement="top"
                 />
+            </Grid>
+            <Grid item xs={3}>
+                <FormControl className={classes.formControl}>
+                    <InputLabel htmlFor="age-helper">Database Server</InputLabel>
+                    <Select
+                        value={values.age}
+                        onChange={xhandleChange}
+                        input={<Input name="age" id="age-helper" />}
+                    >
+                        <MenuItem value="">
+                            <em>None</em>
+                        </MenuItem>
+                        <MenuItem value="db1.blah.com">db1.blah.com</MenuItem>
+                        <MenuItem value="db2.blah.com">db2.blah.com</MenuItem>
+                        <MenuItem value="db3.blah.com">db3.blah.com</MenuItem>
+                    </Select>
+                    <FormHelperText>Select the database for running the query</FormHelperText>
+                </FormControl>
             </Grid>
             <Grid item xs={12}>
                 <TextField

@@ -17,63 +17,70 @@
 (function (root, factory) {
   if (typeof define === 'function' && define.amd) {
     // AMD. Register as an anonymous module.
-    define(['../ApiClient'], factory);
+    define(['../ApiClient', '../model/User'], factory);
   } else if (typeof module === 'object' && module.exports) {
     // CommonJS-like environments that support module.exports, like Node.
-    module.exports = factory(require('../ApiClient'));
+    module.exports = factory(require('../ApiClient'), require('./User'));
   } else {
     // Browser globals (root is window)
     if (!root.DBqueryBench) {
       root.DBqueryBench = {};
     }
-    root.DBqueryBench.User = factory(root.DBqueryBench.ApiClient);
+    root.DBqueryBench.QueryApprovals = factory(root.DBqueryBench.ApiClient, root.DBqueryBench.User);
   }
-}(this, function (ApiClient) {
+}(this, function (ApiClient, User) {
   'use strict';
 
 
 
 
   /**
-   * The User model module.
-   * @module model/User
+   * The QueryApprovals model module.
+   * @module model/QueryApprovals
    * @version 1.0.0
    */
 
   /**
-   * Constructs a new <code>User</code>.
-   * @alias module:model/User
+   * Constructs a new <code>QueryApprovals</code>.
+   * @alias module:model/QueryApprovals
    * @class
-   * @param name {String} 
    */
-  var exports = function (name) {
+  var exports = function () {
     var _this = this;
 
-    _this['name'] = name;
+
+
   };
 
   /**
-   * Constructs a <code>User</code> from a plain JavaScript object, optionally creating a new instance.
+   * Constructs a <code>QueryApprovals</code> from a plain JavaScript object, optionally creating a new instance.
    * Copies all relevant properties from <code>data</code> to <code>obj</code> if supplied or a new instance if not.
    * @param {Object} data The plain JavaScript object bearing properties of interest.
-   * @param {module:model/User} obj Optional instance to populate.
-   * @return {module:model/User} The populated <code>User</code> instance.
+   * @param {module:model/QueryApprovals} obj Optional instance to populate.
+   * @return {module:model/QueryApprovals} The populated <code>QueryApprovals</code> instance.
    */
   exports.constructFromObject = function (data, obj) {
     if (data) {
       obj = obj || new exports();
 
-      if (data.hasOwnProperty('name')) {
-        obj['name'] = ApiClient.convertToType(data['name'], 'String');
+      if (data.hasOwnProperty('user')) {
+        obj['user'] = User.constructFromObject(data['user']);
+      }
+      if (data.hasOwnProperty('approve')) {
+        obj['approve'] = ApiClient.convertToType(data['approve'], 'Boolean');
       }
     }
     return obj;
   }
 
   /**
-   * @member {String} name
+   * @member {module:model/User} user
    */
-  exports.prototype['name'] = undefined;
+  exports.prototype['user'] = undefined;
+  /**
+   * @member {Boolean} approve
+   */
+  exports.prototype['approve'] = undefined;
 
 
 
