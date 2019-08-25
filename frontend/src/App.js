@@ -17,15 +17,8 @@ function App() {
         <Header />
         <Route exact path="/" component={Home} />
         <Route path="/about" component={About} />
-        <Route path="/queries" component={Queries} />
-        <Route
-          path="/queries/:id"
-          component={Edit} />
-        <Route
-          exact
-          path="/queries"
-          component={List}
-        />
+        <Route exact path="/queries" component={List} />
+        <Route path="/queries/:id" component={Edit} />
       </Router>
     </div >
   );
@@ -37,16 +30,6 @@ function Home() {
 
 function About() {
   return <h2>About</h2>;
-}
-
-function Queries({ match }) {
-  return (
-    <Grid container spacing={3}>
-      <Grid item xs={12}>
-        <h2>Queries</h2>
-      </Grid>
-    </Grid>
-  );
 }
 
 function Header() {

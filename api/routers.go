@@ -5,7 +5,6 @@
 package api
 
 import (
-	"fmt"
 	"github.com/gfleury/dbquerybench/config"
 	"strings"
 
@@ -44,17 +43,19 @@ func NewRouter() *gin.Engine {
 	return m
 }
 
-func Index(c *gin.Context) {
-	w := c.Writer
-	fmt.Fprintf(w, "Hello World!")
-}
-
 var routes = Routes{
 	Route{
 		"Index",
 		"GET",
 		"/v1/",
 		Index,
+	},
+
+	Route{
+		"GetQueries",
+		"GET",
+		"/v1/queries",
+		GetQueries,
 	},
 
 	Route{
