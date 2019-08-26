@@ -21,6 +21,49 @@ schemes:
 - "https"
 paths:
   /query:
+    get:
+      tags:
+      - "query"
+      summary: "Get Query waiting for approval"
+      operationId: "getQueries"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "owner"
+        in: "query"
+        description: "Owner to filter by"
+        required: false
+        type: "array"
+        items:
+          type: "string"
+        collectionFormat: "multi"
+        x-exportParamName: "Owner"
+      - name: "status"
+        in: "query"
+        description: "Status values that need to be considered for filter"
+        required: false
+        type: "array"
+        items:
+          type: "string"
+          default: "pending"
+          enum:
+          - "done"
+          - "pending"
+          - "approved"
+          - "failed"
+          - "running"
+        collectionFormat: "multi"
+        x-exportParamName: "Status"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Query"
+        400:
+          description: "Invalid tag value"
+
     post:
       tags:
       - "query"

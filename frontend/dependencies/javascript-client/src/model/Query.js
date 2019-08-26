@@ -61,6 +61,7 @@
 
 
 
+
   };
 
   /**
@@ -86,11 +87,11 @@
       if (data.hasOwnProperty('owner')) {
         obj['owner'] = User.constructFromObject(data['owner']);
       }
-      if (data.hasOwnProperty('servername')) {
-        obj['servername'] = ApiClient.convertToType(data['servername'], 'String');
-      }
       if (data.hasOwnProperty('query')) {
         obj['query'] = ApiClient.convertToType(data['query'], 'String');
+      }
+      if (data.hasOwnProperty('servername')) {
+        obj['servername'] = ApiClient.convertToType(data['servername'], 'String');
       }
       if (data.hasOwnProperty('hasselect')) {
         obj['hasselect'] = ApiClient.convertToType(data['hasselect'], 'Boolean');

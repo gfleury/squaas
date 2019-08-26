@@ -297,6 +297,58 @@
     }
 
     /**
+     * Callback function to receive the result of the getQueries operation.
+     * @callback module:api/QueryApi~getQueriesCallback
+     * @param {String} error Error message, if any.
+     * @param {Array.<module:model/Query>} data The data returned by the service call.
+     * @param {String} response The complete HTTP response.
+     */
+
+    /**
+     * Get Query waiting for approval
+     * @param {Object} opts Optional parameters
+     * @param {Array.<String>} opts.owner Owner to filter by
+     * @param {Array.<module:model/String>} opts.status Status values that need to be considered for filter
+     * @param {module:api/QueryApi~getQueriesCallback} callback The callback function, accepting three arguments: error, data, response
+     * data is of type: {@link Array.<module:model/Query>}
+     */
+    this.getQueries = function (opts, callback) {
+      opts = opts || {};
+      var postBody = null;
+
+
+      var pathParams = {
+      };
+      var queryParams = {
+      };
+      var collectionQueryParams = {
+        'owner': {
+          value: opts['owner'],
+          collectionFormat: 'multi'
+        },
+        'status': {
+          value: opts['status'],
+          collectionFormat: 'multi'
+        },
+      };
+      var headerParams = {
+      };
+      var formParams = {
+      };
+
+      var authNames = [];
+      var contentTypes = [];
+      var accepts = ['application/json'];
+      var returnType = [Query];
+
+      return this.apiClient.callApi(
+        '/query', 'GET',
+        pathParams, queryParams, collectionQueryParams, headerParams, formParams, postBody,
+        authNames, contentTypes, accepts, returnType, callback
+      );
+    }
+
+    /**
      * Callback function to receive the result of the getQueryById operation.
      * @callback module:api/QueryApi~getQueryByIdCallback
      * @param {String} error Error message, if any.

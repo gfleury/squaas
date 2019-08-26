@@ -8,6 +8,7 @@ Name | Type | Description | Notes
 **approvals** | [**[QueryApprovals]**](QueryApprovals.md) |  | [optional] 
 **owner** | [**User**](User.md) |  | [optional] 
 **query** | **String** |  | 
+**servername** | **String** |  | [optional] 
 **hasselect** | **Boolean** |  | [optional] 
 **hasdelete** | **Boolean** |  | [optional] 
 **hasinsert** | **Boolean** |  | [optional] 
