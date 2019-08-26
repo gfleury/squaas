@@ -18,12 +18,12 @@ func Index(c *gin.Context) {
 }
 
 func GetQueries(c *gin.Context) {
-	w := c.Writer
+	//w := c.Writer
 
-	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-	w.WriteHeader(http.StatusOK)
+	// w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	// w.WriteHeader(http.StatusOK)
 
-	c.JSON(http.StatusOK, gin.H{"id": "123123", "name": "Some Query", "row": "AM-123", "status": "OPEN", "owner": "George", "hasTransaction": "true"})
+	c.JSON(http.StatusOK, []gin.H{{"id": "123123", "name": "Some Query", "row": "AM-123", "status": "OPEN", "owner": "George", "hasTransaction": "true"}})
 }
 
 func AddQuery(c *gin.Context) {

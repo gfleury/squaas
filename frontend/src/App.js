@@ -7,9 +7,18 @@ import Edit from "./QueryEdit"
 
 import List from "./QueryList"
 
+import DBqueryBench from 'd_bquery_bench';
+
 import './App.css';
 
+
+
 function App() {
+  var api = new DBqueryBench.QueryApi();
+
+  api.apiClient.basePath = "http://localhost:8080/v1";
+
+  api.apiClient.defaultHeaders = { "Authorization": "Basic YWRtaW46YWRtaW4=" }
 
   return (
     <div className="App">
@@ -17,7 +26,9 @@ function App() {
         <Header />
         <Route exact path="/" component={Home} />
         <Route path="/about" component={About} />
-        <Route exact path="/queries" component={List} />
+        <Route exact path="/queries"
+          render={(props) => <List api={api} />}
+        />
         <Route path="/queries/:id" component={Edit} />
       </Router>
     </div >

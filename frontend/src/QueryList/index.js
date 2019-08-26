@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React from 'react';
 /*eslint no-unused-vars: ["error", { "varsIgnorePattern": "Route" }]*/
 import { BrowserRouter as Route, Router, Link } from "react-router-dom";
 
@@ -24,63 +24,58 @@ const useStyles = makeStyles(theme => ({
     },
 }));
 
-export default class SimpleTable extends Component {
-    constructor() {
-        super();
-        this.classes = useStyles();
-        this.state = {
-            rows: []
-        }
+export default function OutlinedTextFields(props, { match }) {
+    const classes = useStyles();
+    const state = {
+        rows: []
     }
 
-    componentDidMount() {
-        const that = this;
-        fetch('/v1/queris').then(result => {
-            return result.json();
-        }).then(data => {
-            that.setState({rows: data.result});
-        })
-    }
-
-    render() {
-        if (!this.state.rows) {
-            return '';
+    var callback = function (error, data, response) {
+        if (error) {
+            console.error(error);
+        } else {
+            console.log('API called successfully.');
+            console.log(data);
+            console.log(response);
+            state.rows = data
         }
+    };
 
-        return (
-            <Grid item xs={12}>
-                <Paper className={this.classes.root}>
-                    <Table className={this.classes.table}>
-                        <TableHead>
-                            <TableRow key="header">
-                                <TableCell align="left"></TableCell>
-                                <TableCell align="center">Ticket ID</TableCell>
-                                <TableCell align="center">Status</TableCell>
-                                <TableCell align="right">Owner</TableCell>
-                                <TableCell align="right">Query behavior</TableCell>
+    props.api.getQueries({}, callback);
+
+    return (
+        <Grid item xs={12}>
+            <Paper className={classes.root}>
+                <Table className={classes.table}>
+                    <TableHead>
+                        <TableRow key="header">
+                            <TableCell align="left"></TableCell>
+                            <TableCell align="center">Ticket ID</TableCell>
+                            <TableCell align="center">Status</TableCell>
+                            <TableCell align="right">Owner</TableCell>
+                            <TableCell align="right">Query behavior</TableCell>
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
+                        {state.rows.map(row => (
+                            <TableRow hover
+                                key={row.name}>
+                                <TableCell component="th" align="left">
+                                    <Link to={`${match.url}/${row.id}`}>
+                                        <EditIcon className={classes.rightIcon} />
+                                    </Link>
+                                </TableCell>
+                                <TableCell component="th" scope="row" align="center">
+                                    {row.ticketid}
+                                </TableCell>
+                                <TableCell align="center">{row.status}</TableCell>
+                                <TableCell align="right">{row.owner}</TableCell>
+                                <TableCell align="right">{row.hastransaction}</TableCell>
                             </TableRow>
-                        </TableHead>
-                        <TableBody>
-                            {this.state.rows.map(row => (
-                                <TableRow hover
-                                    key={row.name}>
-                                    <TableCell component="th" align="left">
-                                        <Link to={`${this.props.match.url}/${row.id}`}>
-                                            <EditIcon className={this.classes.rightIcon} />
-                                        </Link>
-                                    </TableCell>
-                                    <TableCell component="th" scope="row" align="center">
-                                        {row.ticketid}
-                                    </TableCell>
-                                    <TableCell align="center">{row.status}</TableCell>
-                                    <TableCell align="right">{row.owner}</TableCell>
-                                    <TableCell align="right">{row.hastransaction}</TableCell>
-                                </TableRow>
-                            ))}
-                        </TableBody>
-                    </Table>
-                </Paper>
-            </Grid>
-        );
-    }
+                        ))}
+                    </TableBody>
+                </Table>
+            </Paper>
+        </Grid>
+    );
 }

@@ -5,11 +5,14 @@
 package api
 
 import (
-	"github.com/gfleury/dbquerybench/config"
 	"strings"
+	"time"
+
+	"github.com/gin-contrib/cors"
+	"github.com/gin-gonic/gin"
 
 	"github.com/gfleury/dbquerybench/auth"
-	"github.com/gin-gonic/gin"
+	"github.com/gfleury/dbquerybench/config"
 )
 
 type Route struct {
@@ -25,6 +28,15 @@ func NewRouter() *gin.Engine {
 	var baseAuth *gin.RouterGroup
 
 	m := gin.Default()
+
+	m.Use(cors.New(cors.Config{
+		AllowOrigins:     []string{"*"},
+		AllowMethods:     []string{"GET", "POST", "HEAD", "PUT", "PATCH", "OPTIONS"},
+		AllowHeaders:     []string{"Origin", "authorization", "content-type"},
+		ExposeHeaders:    []string{"Origin", "authorization", "content-type"},
+		AllowCredentials: true,
+		MaxAge:           12 * time.Hour,
+	}))
 
 	authScheme := config.GetConfig().GetString("auth.scheme")
 
@@ -53,8 +65,8 @@ var routes = Routes{
 
 	Route{
 		"GetQueries",
-		"GET",
-		"/v1/queries",
+		strings.ToUpper("Get"),
+		"/v1/query",
 		GetQueries,
 	},
 
