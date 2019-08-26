@@ -87,6 +87,12 @@
       //expect(instance).to.be();
     });
 
+    it('should have the property servername (base name: "servername")', function() {
+      // uncomment below and update the code to test the property servername
+      //var instance = new DBqueryBench.Query();
+      //expect(instance).to.be();
+    });
+
     it('should have the property hasselect (base name: "hasselect")', function() {
       // uncomment below and update the code to test the property hasselect
       //var instance = new DBqueryBench.Query();

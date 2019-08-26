@@ -9,6 +9,7 @@ Method | HTTP request | Description
 [**deleteQuery**](QueryApi.md#deleteQuery) | **DELETE** /query/approve/{queryId} | Deletes a query
 [**findQueryByOwner**](QueryApi.md#findQueryByOwner) | **GET** /query/findByOwner | Finds Query by Owner
 [**findQueryByStatus**](QueryApi.md#findQueryByStatus) | **GET** /query/findByStatus | Finds Query by status
+[**getQueries**](QueryApi.md#getQueries) | **GET** /query | Get Query waiting for approval
 [**getQueryById**](QueryApi.md#getQueryById) | **GET** /query/{queryId} | Find query by ID
 [**updateQuery**](QueryApi.md#updateQuery) | **PUT** /query | Update an existing query
 
@@ -232,6 +233,53 @@ apiInstance.findQueryByStatus(status, callback);
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **status** | [**[String]**](String.md)| Status values that need to be considered for filter | 
+
+### Return type
+
+[**[Query]**](Query.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+<a name="getQueries"></a>
+# **getQueries**
+> [Query] getQueries(opts)
+
+Get Query waiting for approval
+
+### Example
+```javascript
+var DBqueryBench = require('d_bquery_bench');
+
+var apiInstance = new DBqueryBench.QueryApi();
+
+var opts = { 
+  'owner': ["owner_example"], // [String] | Owner to filter by
+  'status': ["status_example"] // [String] | Status values that need to be considered for filter
+};
+
+var callback = function(error, data, response) {
+  if (error) {
+    console.error(error);
+  } else {
+    console.log('API called successfully. Returned data: ' + data);
+  }
+};
+apiInstance.getQueries(opts, callback);
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **owner** | [**[String]**](String.md)| Owner to filter by | [optional] 
+ **status** | [**[String]**](String.md)| Status values that need to be considered for filter | [optional] 
 
 ### Return type
 

@@ -122,6 +122,7 @@ Class | Method | HTTP request | Description
 *DBqueryBench.QueryApi* | [**deleteQuery**](docs/QueryApi.md#deleteQuery) | **DELETE** /query/approve/{queryId} | Deletes a query
 *DBqueryBench.QueryApi* | [**findQueryByOwner**](docs/QueryApi.md#findQueryByOwner) | **GET** /query/findByOwner | Finds Query by Owner
 *DBqueryBench.QueryApi* | [**findQueryByStatus**](docs/QueryApi.md#findQueryByStatus) | **GET** /query/findByStatus | Finds Query by status
+*DBqueryBench.QueryApi* | [**getQueries**](docs/QueryApi.md#getQueries) | **GET** /query | Get Query waiting for approval
 *DBqueryBench.QueryApi* | [**getQueryById**](docs/QueryApi.md#getQueryById) | **GET** /query/{queryId} | Find query by ID
 *DBqueryBench.QueryApi* | [**updateQuery**](docs/QueryApi.md#updateQuery) | **PUT** /query | Update an existing query
 

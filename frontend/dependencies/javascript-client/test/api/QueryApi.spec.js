@@ -101,6 +101,16 @@
         done();
       });
     });
+    describe('getQueries', function() {
+      it('should call getQueries successfully', function(done) {
+        //uncomment below and update the code to test getQueries
+        //instance.getQueries(function(error) {
+        //  if (error) throw error;
+        //expect().to.be();
+        //});
+        done();
+      });
+    });
     describe('getQueryById', function() {
       it('should call getQueryById successfully', function(done) {
         //uncomment below and update the code to test getQueryById
