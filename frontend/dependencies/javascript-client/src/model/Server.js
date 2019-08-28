@@ -26,7 +26,7 @@
     if (!root.DBqueryBench) {
       root.DBqueryBench = {};
     }
-    root.DBqueryBench.User = factory(root.DBqueryBench.ApiClient);
+    root.DBqueryBench.Server = factory(root.DBqueryBench.ApiClient);
   }
 }(this, function (ApiClient) {
   'use strict';
@@ -35,29 +35,31 @@
 
 
   /**
-   * The User model module.
-   * @module model/User
+   * The Server model module.
+   * @module model/Server
    * @version 1.0.0
    */
 
   /**
-   * Constructs a new <code>User</code>.
-   * @alias module:model/User
+   * Constructs a new <code>Server</code>.
+   * @alias module:model/Server
    * @class
    * @param name {String} 
+   * @param uri {String} 
    */
-  var exports = function (name) {
+  var exports = function (name, uri) {
     var _this = this;
 
     _this['name'] = name;
+    _this['uri'] = uri;
   };
 
   /**
-   * Constructs a <code>User</code> from a plain JavaScript object, optionally creating a new instance.
+   * Constructs a <code>Server</code> from a plain JavaScript object, optionally creating a new instance.
    * Copies all relevant properties from <code>data</code> to <code>obj</code> if supplied or a new instance if not.
    * @param {Object} data The plain JavaScript object bearing properties of interest.
-   * @param {module:model/User} obj Optional instance to populate.
-   * @return {module:model/User} The populated <code>User</code> instance.
+   * @param {module:model/Server} obj Optional instance to populate.
+   * @return {module:model/Server} The populated <code>Server</code> instance.
    */
   exports.constructFromObject = function (data, obj) {
     if (data) {
@@ -65,6 +67,9 @@
 
       if (data.hasOwnProperty('name')) {
         obj['name'] = ApiClient.convertToType(data['name'], 'String');
+      }
+      if (data.hasOwnProperty('uri')) {
+        obj['uri'] = ApiClient.convertToType(data['uri'], 'String');
       }
     }
     return obj;
@@ -74,6 +79,10 @@
    * @member {String} name
    */
   exports.prototype['name'] = undefined;
+  /**
+   * @member {String} uri
+   */
+  exports.prototype['uri'] = undefined;
 
 
 

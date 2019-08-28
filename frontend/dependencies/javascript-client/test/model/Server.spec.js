@@ -31,7 +31,7 @@
   var instance;
 
   beforeEach(function() {
-    instance = new DBqueryBench.User();
+    instance = new DBqueryBench.Server();
   });
 
   var getProperty = function(object, getter, property) {
@@ -50,16 +50,22 @@
       object[property] = value;
   }
 
-  describe('User', function() {
-    it('should create an instance of User', function() {
-      // uncomment below and update the code to test User
-      //var instance = new DBqueryBench.User();
-      //expect(instance).to.be.a(DBqueryBench.User);
+  describe('Server', function() {
+    it('should create an instance of Server', function() {
+      // uncomment below and update the code to test Server
+      //var instance = new DBqueryBench.Server();
+      //expect(instance).to.be.a(DBqueryBench.Server);
     });
 
     it('should have the property name (base name: "name")', function() {
       // uncomment below and update the code to test the property name
-      //var instance = new DBqueryBench.User();
+      //var instance = new DBqueryBench.Server();
+      //expect(instance).to.be();
+    });
+
+    it('should have the property uri (base name: "uri")', function() {
+      // uncomment below and update the code to test the property uri
+      //var instance = new DBqueryBench.Server();
       //expect(instance).to.be();
     });
 

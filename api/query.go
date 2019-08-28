@@ -6,6 +6,8 @@ package api
 
 import (
 	"fmt"
+	"github.com/gfleury/dbquerybench/config"
+	"github.com/gfleury/dbquerybench/models"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -34,6 +36,14 @@ func AddQuery(c *gin.Context) {
 	w.WriteHeader(http.StatusOK)
 }
 
+func DeleteQuery(c *gin.Context) {
+	w := c.Writer
+	// r := c.Request
+
+	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	w.WriteHeader(http.StatusOK)
+}
+
 func ApproveQuery(c *gin.Context) {
 	w := c.Writer
 	// r := c.Request
@@ -42,7 +52,7 @@ func ApproveQuery(c *gin.Context) {
 	w.WriteHeader(http.StatusOK)
 }
 
-func DeleteQuery(c *gin.Context) {
+func DeleteApprovalQuery(c *gin.Context) {
 	w := c.Writer
 	// r := c.Request
 
@@ -80,4 +90,15 @@ func UpdateQuery(c *gin.Context) {
 
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	w.WriteHeader(http.StatusOK)
+}
+
+func GetDatabases(c *gin.Context) {
+	databases := config.GetConfig().GetStringMapString("databases")
+	servers := models.Servers{}
+
+	for server := range databases {
+		servers = append(servers, models.Server{Name: server})
+	}
+
+	c.JSON(http.StatusOK, servers)
 }

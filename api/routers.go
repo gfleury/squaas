@@ -5,6 +5,7 @@
 package api
 
 import (
+	"fmt"
 	"strings"
 	"time"
 
@@ -55,12 +56,32 @@ func NewRouter() *gin.Engine {
 	return m
 }
 
+func AppIndex(c *gin.Context) {
+	w := c.Writer
+
+	fmt.Fprintf(w, "Hello World!")
+}
+
 var routes = Routes{
 	Route{
 		"Index",
-		"GET",
+		strings.ToUpper("Get"),
+		"/",
+		AppIndex,
+	},
+
+	Route{
+		"Index",
+		strings.ToUpper("Get"),
 		"/v1/",
 		Index,
+	},
+
+	Route{
+		"GetDatabases",
+		strings.ToUpper("Get"),
+		"/v1/databases",
+		GetDatabases,
 	},
 
 	Route{
@@ -85,9 +106,16 @@ var routes = Routes{
 	},
 
 	Route{
-		"DeleteQuery",
+		"DeleteApprovalQuery",
 		strings.ToUpper("Delete"),
 		"/v1/query/approve/{queryId}",
+		DeleteApprovalQuery,
+	},
+
+	Route{
+		"DeleteQuery",
+		strings.ToUpper("Delete"),
+		"/v1/query/{queryId}",
 		DeleteQuery,
 	},
 

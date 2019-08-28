@@ -24,6 +24,15 @@ func (s *Suite) SetUpSuite(c *check.C) {
 	db.InitStorage()
 	err := db.DBStorage.Init()
 	c.Assert(err, check.IsNil)
+
+	// Database config used for tests
+	config.GetConfig().Set("databases", map[string]string{
+		"server1": "postgresql://localhost:34992/database2",
+		"server2": "postgresql://caixaprego:93939/database333",
+	})
+
+	config.GetConfig().Set("auth.config.users", map[string]string{"admin": "admin"})
+
 }
 func (s *Suite) TearDownSuite(c *check.C) {
 	// Clean test database
@@ -43,6 +52,7 @@ func Test(t *testing.T) {
 }
 
 func (s *Suite) executeRequest(req *http.Request) *httptest.ResponseRecorder {
+	req.SetBasicAuth("admin", "admin")
 	rr := httptest.NewRecorder()
 	s.router.ServeHTTP(rr, req)
 

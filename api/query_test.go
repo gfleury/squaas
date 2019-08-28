@@ -137,3 +137,21 @@ func (s *Suite) TestUpdateQuery(c *check.C) {
 	c.Assert(responseQuery.Owner, check.DeepEquals, responseQueryNew.Owner)
 	c.Assert(responseQuery.Query, check.DeepEquals, responseQueryNew.Query)
 }
+
+func (s *Suite) TestGetDatabases(c *check.C) {
+	req, _ := http.NewRequest("GET", "/v1/databases", nil)
+	response := s.executeRequest(req)
+
+	c.Assert(response.Code, check.Equals, http.StatusOK)
+
+	servers := &models.Servers{}
+
+	err := servers.Parse(response.Body)
+	c.Assert(err, check.IsNil)
+
+	c.Assert(len(*servers), check.Equals, 2)
+	c.Assert(*servers, check.DeepEquals, models.Servers{
+		{Name: "server1"},
+		{Name: "server2"},
+	})
+}

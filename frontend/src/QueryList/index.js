@@ -13,69 +13,73 @@ import Grid from '@material-ui/core/Grid';
 
 import EditIcon from '@material-ui/icons/Edit';
 
-const useStyles = makeStyles(theme => ({
-    root: {
-        width: '100%',
-        marginTop: theme.spacing(3),
-        overflowX: 'auto',
-    },
-    table: {
-        minWidth: 650,
-    },
-}));
 
-export default function OutlinedTextFields(props, { match }) {
-    const classes = useStyles();
-    const state = {
-        rows: []
+
+export default class QueryList extends React.Component {
+
+    classes = makeStyles(theme => ({
+        root: {
+            width: '100%',
+            marginTop: theme.spacing(3),
+            overflowX: 'auto',
+        },
+        table: {
+            minWidth: 650,
+        },
+    }));
+
+    state = {
+        queries: [],
     }
 
-    var callback = function (error, data, response) {
-        if (error) {
-            console.error(error);
-        } else {
-            console.log('API called successfully.');
-            console.log(data);
-            console.log(response);
-            state.rows = data
-        }
-    };
+    componentDidMount() {
+        var _this = this;
+        this.props.api.getQueries({}, function (error, data) {
+            if (error) {
+                console.error(error);
+            } else {
+                console.log('API called successfully.');
+                console.log(data);
+                _this.setState({ queries: data })
+            }
+        });
+    }
 
-    props.api.getQueries({}, callback);
-
-    return (
-        <Grid item xs={12}>
-            <Paper className={classes.root}>
-                <Table className={classes.table}>
-                    <TableHead>
-                        <TableRow key="header">
-                            <TableCell align="left"></TableCell>
-                            <TableCell align="center">Ticket ID</TableCell>
-                            <TableCell align="center">Status</TableCell>
-                            <TableCell align="right">Owner</TableCell>
-                            <TableCell align="right">Query behavior</TableCell>
-                        </TableRow>
-                    </TableHead>
-                    <TableBody>
-                        {state.rows.map(row => (
-                            <TableRow hover
-                                key={row.name}>
-                                <TableCell component="th" align="left">
-                                    <Link to={`${match.url}/${row.id}`}>
-                                        <EditIcon className={classes.rightIcon} />
-                                    </Link>
-                                </TableCell>
-                                <TableCell component="th" scope="row" align="center">
-                                    {row.ticketid}
-                                </TableCell>
-                                <TableCell align="center">{row.status}</TableCell>
-                                <TableCell align="right">{row.owner}</TableCell>
-                                <TableCell align="right">{row.hastransaction}</TableCell>
+    render() {
+        return (
+            <Grid item xs={12} >
+                <Paper className={this.classes.root}>
+                    <Table className={this.classes.table}>
+                        <TableHead>
+                            <TableRow key="header">
+                                <TableCell align="left"></TableCell>
+                                <TableCell align="center">Ticket ID</TableCell>
+                                <TableCell align="center">Status</TableCell>
+                                <TableCell align="right">Owner</TableCell>
+                                <TableCell align="right">Query behavior</TableCell>
                             </TableRow>
-                        ))}
-                    </TableBody>
-                </Table>
-            </Paper>
-        </Grid>
-    );
+                        </TableHead>
+                        <TableBody>
+                            {this.state.queries.map(query => (
+                                <TableRow hover
+                                    key={query.id}>
+                                    <TableCell component="th" align="left">
+                                        <Link to={`${this.props.match.url}/${query.id}`}>
+                                            <EditIcon className={this.classes.rightIcon} />
+                                        </Link>
+                                    </TableCell>
+                                    <TableCell component="th" scope="row" align="center">
+                                        {query.ticketid}
+                                    </TableCell>
+                                    <TableCell align="center">{query.status}</TableCell>
+                                    <TableCell align="right">{query.owner.name}</TableCell>
+                                    <TableCell align="right">{query.hastransaction}</TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+                </Paper>
+            </Grid>
+        );
+    }
 }

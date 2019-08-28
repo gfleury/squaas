@@ -6,7 +6,8 @@ Method | HTTP request | Description
 ------------- | ------------- | -------------
 [**addQuery**](QueryApi.md#addQuery) | **POST** /query | Add a new query to the queue
 [**approveQuery**](QueryApi.md#approveQuery) | **POST** /query/approve/{queryId} | Approve a query in the queue
-[**deleteQuery**](QueryApi.md#deleteQuery) | **DELETE** /query/approve/{queryId} | Deletes a query
+[**deleteApprovalQuery**](QueryApi.md#deleteApprovalQuery) | **DELETE** /query/approve/{queryId} | Deletes an approval of a query
+[**deleteQuery**](QueryApi.md#deleteQuery) | **DELETE** /query/{queryId} | Deletes a query
 [**findQueryByOwner**](QueryApi.md#findQueryByOwner) | **GET** /query/findByOwner | Finds Query by Owner
 [**findQueryByStatus**](QueryApi.md#findQueryByStatus) | **GET** /query/findByStatus | Finds Query by status
 [**getQueries**](QueryApi.md#getQueries) | **GET** /query | Get Query waiting for approval
@@ -107,6 +108,52 @@ No authorization required
 ### HTTP request headers
 
  - **Content-Type**: application/json
+ - **Accept**: application/json
+
+<a name="deleteApprovalQuery"></a>
+# **deleteApprovalQuery**
+> deleteApprovalQuery(queryId)
+
+Deletes an approval of a query
+
+
+
+### Example
+```javascript
+var DBqueryBench = require('d_bquery_bench');
+
+var apiInstance = new DBqueryBench.QueryApi();
+
+var queryId = 789; // Number | Query id to delete
+
+
+var callback = function(error, data, response) {
+  if (error) {
+    console.error(error);
+  } else {
+    console.log('API called successfully.');
+  }
+};
+apiInstance.deleteApprovalQuery(queryId, callback);
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **queryId** | **Number**| Query id to delete | 
+
+### Return type
+
+null (empty response body)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
  - **Accept**: application/json
 
 <a name="deleteQuery"></a>
