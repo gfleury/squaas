@@ -3,11 +3,11 @@ import React from 'react';
 import { BrowserRouter as Router, Route, Link } from "react-router-dom";
 import Grid from '@material-ui/core/Grid';
 
-import Edit from "./QueryEdit"
-
 import DBqueryBench from 'd_bquery_bench';
 
 import QueryList from "./QueryList";
+import QueryNew from "./QueryNew";
+import QueryEdit from "./QueryEdit"
 
 import './App.css';
 
@@ -23,11 +23,14 @@ const isLocalhost = Boolean(
 
 function App() {
   var api = new DBqueryBench.QueryApi();
+  var dbApi = new DBqueryBench.DatabasesApi();
 
   api.apiClient.basePath = "http://localhost:8080/v1";
+  dbApi.apiClient.basePath = "http://localhost:8080/v1";
 
   if (isLocalhost) {
     api.apiClient.defaultHeaders = { "Authorization": "Basic YWRtaW46YWRtaW4=" }
+    dbApi.apiClient.defaultHeaders = { "Authorization": "Basic YWRtaW46YWRtaW4=" }
   }
 
   return (
@@ -38,7 +41,10 @@ function App() {
         <Route exact path="/queries"
           render={(props) => <QueryList api={api} {...props} />}
         />
-        <Route path="/queries/:id" component={Edit} />
+        <Route path="/queries/new"
+          render={(props) => <QueryNew dbApi={dbApi} api={api} {...props} />}
+        />
+        <Route path="/queries/edit/:id" component={QueryEdit} />
       </Router>
     </div >
   );
@@ -56,6 +62,9 @@ function Header() {
       </Grid>
       <Grid item xs>
         <Link to="/queries">Queries</Link>
+      </Grid>
+      <Grid item xs>
+        <Link to="/queries/new">Create Query</Link>
       </Grid>
     </Grid>
   );

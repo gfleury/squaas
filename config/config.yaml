@@ -4,3 +4,7 @@ auth:
     users:
       admin: admin
       test: test123
+databases:
+  db.test.com: "postgresql://localhost:5423/blehws"
+  db.staging.test.com: "postgresql://localhost:5424/blehws"
+  db-test: "postgresql://127.0.0.1:5424/blehws"
