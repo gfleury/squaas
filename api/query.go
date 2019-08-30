@@ -114,9 +114,16 @@ func AddQuery(c *gin.Context) {
 func DeleteQuery(c *gin.Context) {
 	var query models.Query
 
+	QueryID := c.Param("queryId")
+
+	if !models.IsValidObjectId(QueryID) {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid query ID"})
+		return
+	}
+
 	QueryDB := db.DBStorage.Connection().Model("Query")
 
-	err := QueryDB.FindId(bson.ObjectIdHex(c.Param("queryId"))).Exec(&query)
+	err := QueryDB.FindId(bson.ObjectIdHex(QueryID)).Exec(&query)
 
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
@@ -172,9 +179,16 @@ func FindQueryByStatus(c *gin.Context) {
 func GetQueryById(c *gin.Context) {
 	var query models.Query
 
+	QueryID := c.Param("queryId")
+
+	if !models.IsValidObjectId(QueryID) {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid query ID"})
+		return
+	}
+
 	QueryDB := db.DBStorage.Connection().Model("Query")
 
-	err := QueryDB.FindId(bson.ObjectIdHex(c.Param("queryId"))).Exec(&query)
+	err := QueryDB.FindId(bson.ObjectIdHex(QueryID)).Exec(&query)
 
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})

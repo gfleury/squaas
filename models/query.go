@@ -8,6 +8,7 @@ import (
 	"encoding/json"
 	"io"
 	"io/ioutil"
+	"regexp"
 	"strings"
 
 	"github.com/xwb1989/sqlparser"
@@ -105,4 +106,10 @@ func (q *Query) LintSQLQuery() error {
 		}
 	}
 	return nil
+}
+
+var validID = regexp.MustCompile(`^[0-9a-fA-F]{24}$`)
+
+func IsValidObjectId(id string) bool {
+	return validID.MatchString(id)
 }
