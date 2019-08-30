@@ -190,7 +190,7 @@ export default class QueryNew extends React.Component {
                             <FormHelperText>Select the database for running the query</FormHelperText>
                         </FormControl>
                     </Grid>
-                    <Grid item xs={12}>
+                    <Grid item xs={6}>
                         <TextField
                             required
                             id="query"
@@ -208,7 +208,7 @@ export default class QueryNew extends React.Component {
                             fullWidth
                         />
                     </Grid>
-                    <Grid item xs={12}>
+                    <Grid item xs={6}>
                         <SyntaxHighlighter
                             id="query"
                             name="query"

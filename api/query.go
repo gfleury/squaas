@@ -35,6 +35,11 @@ func GetQueries(c *gin.Context) {
 		return
 	}
 
+	if len(queries) == 0 {
+		c.JSON(http.StatusOK, []models.Query{})
+		return
+	}
+
 	c.JSON(http.StatusOK, queries)
 }
 
@@ -145,19 +150,67 @@ func DeleteQuery(c *gin.Context) {
 }
 
 func ApproveQuery(c *gin.Context) {
-	w := c.Writer
-	// r := c.Request
+	var query models.Query
 
-	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-	w.WriteHeader(http.StatusOK)
+	QueryID := c.Param("queryId")
+
+	if !models.IsValidObjectId(QueryID) {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid query ID"})
+		return
+	}
+
+	QueryDB := db.DBStorage.Connection().Model("Query")
+
+	err := QueryDB.FindId(bson.ObjectIdHex(QueryID)).Exec(&query)
+
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		return
+	}
+
+	userApproving, _, _ := c.Request.BasicAuth()
+
+	query.AddApproval(&models.User{Name: userApproving}, true)
+
+	err = query.Save()
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"error": "Approved with success"})
 }
 
 func DeleteApprovalQuery(c *gin.Context) {
-	w := c.Writer
-	// r := c.Request
+	var query models.Query
 
-	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-	w.WriteHeader(http.StatusOK)
+	QueryID := c.Param("queryId")
+
+	if !models.IsValidObjectId(QueryID) {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid query ID"})
+		return
+	}
+
+	QueryDB := db.DBStorage.Connection().Model("Query")
+
+	err := QueryDB.FindId(bson.ObjectIdHex(QueryID)).Exec(&query)
+
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		return
+	}
+
+	userApproving, _, _ := c.Request.BasicAuth()
+
+	query.AddApproval(&models.User{Name: userApproving}, false)
+
+	err = query.Save()
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"error": "Disapproved with success"})
 }
 
 func FindQueryByOwner(c *gin.Context) {

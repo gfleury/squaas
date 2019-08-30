@@ -108,6 +108,9 @@
       if (data.hasOwnProperty('hastransaction')) {
         obj['hastransaction'] = ApiClient.convertToType(data['hastransaction'], 'Boolean');
       }
+      if (data.hasOwnProperty('hasalter')) {
+        obj['hasalter'] = ApiClient.convertToType(data['hasalter'], 'Boolean');
+      }
       if (data.hasOwnProperty('status')) {
         obj['status'] = ApiClient.convertToType(data['status'], 'String');
       }
@@ -148,23 +151,27 @@
   /**
    * @member {Boolean} hasselect
    */
-  exports.prototype['hasselect'] = undefined;
+  exports.prototype['hasselect'] = false;
   /**
    * @member {Boolean} hasdelete
    */
-  exports.prototype['hasdelete'] = undefined;
+  exports.prototype['hasdelete'] = false;
   /**
    * @member {Boolean} hasinsert
    */
-  exports.prototype['hasinsert'] = undefined;
+  exports.prototype['hasinsert'] = false;
   /**
    * @member {Boolean} hasupdate
    */
-  exports.prototype['hasupdate'] = undefined;
+  exports.prototype['hasupdate'] = false;
   /**
    * @member {Boolean} hastransaction
    */
-  exports.prototype['hastransaction'] = undefined;
+  exports.prototype['hastransaction'] = false;
+  /**
+   * @member {Boolean} hasalter
+   */
+  exports.prototype['hasalter'] = false;
   /**
    * query status in the store
    * @member {module:model/Query.StatusEnum} status

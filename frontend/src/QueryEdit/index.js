@@ -15,11 +15,14 @@ import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
 import Input from '@material-ui/core/Input';
 
+import Snackbar from '@material-ui/core/Snackbar';
+import IconButton from '@material-ui/core/IconButton';
+import CloseIcon from '@material-ui/icons/Close';
 
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { atomDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 
-//import DBqueryBench from 'd_bquery_bench';
+import DBqueryBench from 'd_bquery_bench';
 
 
 export default class QueryEdit extends React.Component {
@@ -33,7 +36,7 @@ export default class QueryEdit extends React.Component {
             server: "",
             status: "Ready",
             ticketid: "",
-            query: "-- SQL Query\n-- Paste it here\nSELECT * FROM XTABLE;",
+            query: "",
             owner: "",
             hasselect: false,
             hasalter: false,
@@ -44,6 +47,10 @@ export default class QueryEdit extends React.Component {
         };
 
         this.handleChange = this.handleChange.bind(this);
+        this.handleParse = this.handleParse.bind(this);
+        this.handleSubmit = this.handleSubmit.bind(this);
+        this.handleApprove = this.handleApprove.bind(this);
+        this.handleDisapprove = this.handleDisapprove.bind(this);
     }
 
     classes = makeStyles(theme => ({
@@ -120,10 +127,83 @@ export default class QueryEdit extends React.Component {
 
     }
 
+    handleParse(event) {
+        var _this = this;
+        var query = new DBqueryBench.Query();
+
+        query.status = "PARSEONLY"
+        query.query = this.state.query;
+        query.ticketid = this.state.ticketid;
+        query.servername = this.state.server;
+
+        this.props.api.addQuery(query, function (error, data, response) {
+            if (error) {
+                _this.setState({ parseStatus: true, parseText: response.body.error })
+            } else {
+                _this.setState({ parseStatus: true, parseText: "Successfully checked" })
+                _this.setState({})
+            }
+        });
+        //console.log(this.state);
+        event.preventDefault();
+    }
+
+    handleApprove(event) {
+        var _this = this;
+
+        this.props.api.approveQuery(this.state.id, "pending", function (error, data, response) {
+            if (error) {
+                _this.setState({ parseStatus: true, parseText: response.body.error })
+            } else {
+                _this.setState({ parseStatus: true, parseText: "Successfully approved" })
+                _this.setState({})
+            }
+        });
+        //console.log(this.state);
+        event.preventDefault();
+    }
+
+    handleDisapprove(event) {
+        var _this = this;
+
+        this.props.api.deleteApprovalQuery(this.state.id, function (error, data, response) {
+            if (error) {
+                _this.setState({ parseStatus: true, parseText: response.body.error })
+            } else {
+                _this.setState({ parseStatus: true, parseText: "Successfully disapproved" })
+                _this.setState({})
+            }
+        });
+        //console.log(this.state);
+        event.preventDefault();
+    }
+
+    handleSubmit(event) {
+        var _this = this;
+        var query = new DBqueryBench.Query();
+
+        query.status = this.state.status;
+        query.query = this.state.query;
+        query.ticketid = this.state.ticketid;
+        query.servername = this.state.server;
+        query.id = this.state.id
+
+        this.props.api.updateQuery(query, function (error, data, response) {
+            if (error) {
+                _this.setState({ parseStatus: true, parseText: response.body.error })
+            } else {
+                _this.setState({ parseStatus: true, parseText: "Successfully saved query" })
+                _this.componentDidMount()
+            }
+        });
+        //console.log(this.state);
+        event.preventDefault();
+    }
+
     render() {
         return (
 
-            <form className={this.classes.container} noValidate autoComplete="off" >
+            <form className={this.classes.container} onSubmit={this.handleSubmit} autoComplete="off" >
                 <Grid container spacing={3}>
                     <Grid item xs={6} sm={3}>
                         <TextField
@@ -178,6 +258,7 @@ export default class QueryEdit extends React.Component {
                         />
                     </Grid>
                     <Grid item xs={9}>
+
                         <FormLabel component="legend">Query behaviors</FormLabel>
                         <FormControlLabel
                             value="Transaction"
@@ -227,6 +308,7 @@ export default class QueryEdit extends React.Component {
                             label="ALTER"
                             labelPlacement="top"
                         />
+
                     </Grid>
                     <Grid item xs={3}>
                         <FormControl className={this.classes.formControl}>
@@ -247,14 +329,14 @@ export default class QueryEdit extends React.Component {
                             <FormHelperText>Select the database for running the query</FormHelperText>
                         </FormControl>
                     </Grid>
-                    <Grid item xs={12}>
+                    <Grid item xs={6}>
                         <TextField
                             required
                             id="query"
                             name="query"
                             label="SQL Query"
                             multiline
-                            defaultValue={this.state.query}
+                            value={this.state.query}
                             className={this.classes.textField}
                             onChange={this.handleChange}
                             margin="normal"
@@ -265,7 +347,7 @@ export default class QueryEdit extends React.Component {
                             fullWidth
                         />
                     </Grid>
-                    <Grid item xs={12}>
+                    <Grid item xs={6}>
                         <SyntaxHighlighter
                             id="query"
                             name="query"
@@ -277,20 +359,44 @@ export default class QueryEdit extends React.Component {
                         />
                     </Grid>
                     <Grid item xs>
-                        <Button type="submit" variant="contained" className={this.classes.button}>
+                        <Button onClick={this.handleParse} variant="contained" className={this.classes.button}>
                             PARSE
                 </Button>
                         <Button type="submit" variant="contained" className={this.classes.button}>
                             SAVE
                 </Button>
-                        <Button type="submit" variant="contained" className={this.classes.button}>
+                        <Button onClick={this.handleApprove} variant="contained" className={this.classes.button}>
                             APPROVE
                 </Button>
-                        <Button type="submit" variant="contained" className={this.classes.button}>
+                        <Button onClick={this.handleDisapprove} variant="contained" className={this.classes.button}>
                             DISAPROVE
                 </Button>
                     </Grid>
                 </Grid >
+                <Snackbar
+                    anchorOrigin={{
+                        vertical: 'bottom',
+                        horizontal: 'left',
+                    }}
+                    open={this.state.parseStatus}
+                    autoHideDuration={2000}
+                    onClose={() => { this.setState({ parseStatus: false }) }}
+                    ContentProps={{
+                        'aria-describedby': 'message-id',
+                    }}
+                    message={<span id="message-id">{this.state.parseText}</span>}
+                    action={[
+                        <IconButton
+                            key="close"
+                            aria-label="close"
+                            color="inherit"
+                            className={this.classes.close}
+                            onClick={() => { this.setState({ parseStatus: false }) }}
+                        >
+                            <CloseIcon />
+                        </IconButton>,
+                    ]}
+                />
             </form >
 
         );

@@ -141,7 +141,7 @@
       var returnType = null;
 
       return this.apiClient.callApi(
-        '/query/approve/{queryId}', 'POST',
+        '/query/{queryId}/approve', 'POST',
         pathParams, queryParams, collectionQueryParams, headerParams, formParams, postBody,
         authNames, contentTypes, accepts, returnType, callback
       );
@@ -188,7 +188,7 @@
       var returnType = null;
 
       return this.apiClient.callApi(
-        '/query/approve/{queryId}', 'DELETE',
+        '/query/{queryId}/approve', 'DELETE',
         pathParams, queryParams, collectionQueryParams, headerParams, formParams, postBody,
         authNames, contentTypes, accepts, returnType, callback
       );

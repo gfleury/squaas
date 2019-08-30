@@ -16,8 +16,8 @@ import (
 )
 
 type Approvals struct {
-	User     *User `json:"user,omitempty" bson:"user"`
-	Approved bool  `json:"approved,omitempty" bson:"approved"`
+	User     *User `json:"user" bson:"user"`
+	Approved bool  `json:"approved" bson:"approved"`
 }
 
 type Query struct {
@@ -31,9 +31,9 @@ type Query struct {
 
 	Query string `json:"query" bson:"query"`
 
-	Status string `json:"status,omitempty" bson:"status"`
+	Status string `json:"status" bson:"status"`
 
-	Approvals []Approvals `json:"approvals,omitempty" bson:"approvals"`
+	Approvals []Approvals `json:"approvals" bson:"approvals"`
 
 	HasSelect bool `json:"hasselect,omitempty" bson:"hasselect"`
 
@@ -55,7 +55,7 @@ func (q *Query) Byte() (objBytes []byte, err error) {
 func (q *Query) Merge(eq *Query) (err error) {
 	q.TicketID = eq.TicketID
 	q.Query = eq.Query
-	return err
+	return q.LintSQLQuery()
 }
 
 func (q *Query) Parse(bodyReader io.Reader) error {
@@ -77,6 +77,12 @@ func (q *Query) AddApproval(u *User, approve bool) {
 }
 
 func (q *Query) LintSQLQuery() error {
+	q.HasAlter = false
+	q.HasSelect = false
+	q.HasInsert = false
+	q.HasTransaction = false
+	q.HasDelete = false
+
 	hasBegin := false
 
 	r := strings.NewReader(q.Query)
@@ -103,6 +109,8 @@ func (q *Query) LintSQLQuery() error {
 			}
 		case *sqlparser.Delete:
 			q.HasDelete = true
+		case *sqlparser.DDL:
+			q.HasAlter = true
 		}
 	}
 	return nil
