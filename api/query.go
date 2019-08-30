@@ -6,6 +6,7 @@ package api
 
 import (
 	"fmt"
+	"gopkg.in/mgo.v2/bson"
 	"log"
 	"net/http"
 
@@ -23,18 +24,21 @@ func Index(c *gin.Context) {
 }
 
 func GetQueries(c *gin.Context) {
-	//w := c.Writer
+	var queries []*models.Query
 
-	// w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-	// w.WriteHeader(http.StatusOK)
+	QueryDB := db.DBStorage.Connection().Model("Query")
 
-	c.JSON(http.StatusOK, []gin.H{{"id": "123123", "name": "Some Query", "row": "AM-123", "status": "OPEN", "owner": "George", "hasTransaction": "true"}})
+	err := QueryDB.Find(bson.M{"deleted": false}).Exec(&queries)
+
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, queries)
 }
 
 func AddQuery(c *gin.Context) {
-	// w := c.Writer
-	// r := c.Request
-
 	var query models.Query
 
 	err := c.BindJSON(&query)
@@ -43,6 +47,15 @@ func AddQuery(c *gin.Context) {
 		return
 	}
 
+	ownerUser, _, ok := c.Request.BasicAuth()
+
+	if !ok {
+		c.JSON(http.StatusForbidden, gin.H{"error": "You must be authenticated"})
+	}
+
+	query.Owner.Name = ownerUser
+
+	log.Printf("Parsing query owner: %s\n", query.Owner)
 	log.Printf("Parsing query ticketID: %s\n", query.TicketID)
 	log.Printf("Parsing query status: %s\n", query.Status)
 	log.Printf("Parsing query serverName: %s\n", query.ServerName)
@@ -95,20 +108,33 @@ func AddQuery(c *gin.Context) {
 		return
 	}
 
-	if err != nil {
-		c.JSON(http.StatusMethodNotAllowed, gin.H{"error": err.Error()})
-		return
-	}
-
 	c.JSON(http.StatusOK, query)
 }
 
 func DeleteQuery(c *gin.Context) {
-	w := c.Writer
-	// r := c.Request
+	var query models.Query
 
-	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-	w.WriteHeader(http.StatusOK)
+	QueryDB := db.DBStorage.Connection().Model("Query")
+
+	err := QueryDB.FindId(bson.ObjectIdHex(c.Param("queryId"))).Exec(&query)
+
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		return
+	}
+
+	if query.Deleted {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Query not found"})
+		return
+	}
+
+	err = query.Delete()
+	if err != nil {
+		c.JSON(http.StatusConflict, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"error": "Successfully deleted"})
 }
 
 func ApproveQuery(c *gin.Context) {
@@ -144,19 +170,64 @@ func FindQueryByStatus(c *gin.Context) {
 }
 
 func GetQueryById(c *gin.Context) {
-	w := c.Writer
-	// r := c.Request
+	var query models.Query
 
-	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-	w.WriteHeader(http.StatusOK)
+	QueryDB := db.DBStorage.Connection().Model("Query")
+
+	err := QueryDB.FindId(bson.ObjectIdHex(c.Param("queryId"))).Exec(&query)
+
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, query)
 }
 
 func UpdateQuery(c *gin.Context) {
-	w := c.Writer
-	// r := c.Request
+	var queryUpdated, queryOriginal models.Query
 
-	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-	w.WriteHeader(http.StatusOK)
+	err := c.BindJSON(&queryUpdated)
+	if err != nil {
+		c.JSON(http.StatusMethodNotAllowed, gin.H{"error": err.Error()})
+		return
+	}
+
+	requestingUser, _, ok := c.Request.BasicAuth()
+
+	if !ok {
+		c.JSON(http.StatusForbidden, gin.H{"error": "You must be authenticated"})
+	}
+
+	QueryDB := db.DBStorage.Connection().Model("Query")
+
+	err = QueryDB.FindId(queryUpdated.GetId()).Exec(&queryOriginal)
+
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		return
+	}
+
+	if requestingUser != queryOriginal.Owner.Name {
+		c.JSON(http.StatusForbidden, gin.H{"error": "You must have ownership to be able to update it"})
+		return
+	}
+
+	err = queryOriginal.Merge(&queryUpdated)
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	err = queryOriginal.Save()
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, queryOriginal)
 }
 
 func GetDatabases(c *gin.Context) {

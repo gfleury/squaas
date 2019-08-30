@@ -15,10 +15,10 @@ import (
 
 func (s *Suite) TestCreateQuery(c *check.C) {
 	query := &models.Query{
-		TicketID: "BLEH-330",
-		// Owner:    models.User{Name: "admin@boom.org"},
-		Query:      "SELECT * FROM TABLE;",
-		ServerName: "db1.blah.com",
+		TicketID:   "BLEH-330",
+		Query:      "SELECT * FROM XTABLE;",
+		ServerName: "server1",
+		Status:     "Ready",
 	}
 
 	queryBytes, err := query.Byte()
@@ -38,13 +38,13 @@ func (s *Suite) TestCreateQuery(c *check.C) {
 	c.Assert(err, check.IsNil)
 
 	c.Assert(responseQuery.TicketID, check.Equals, query.TicketID)
-	c.Assert(responseQuery.Status, check.Equals, "pending")
+	c.Assert(responseQuery.Status, check.Equals, "Ready")
 	c.Assert(responseQuery.Query, check.Equals, query.Query)
 	c.Assert(responseQuery.ServerName, check.Equals, query.ServerName)
 
 	// Check GetQuery
 
-	req, _ = http.NewRequest("GET", fmt.Sprintf("/v1/query/%s", responseQuery.Id), nil)
+	req, _ = http.NewRequest("GET", fmt.Sprintf("/v1/query/%s", responseQuery.Id.Hex()), nil)
 	response = s.executeRequest(req)
 
 	c.Assert(response.Code, check.Equals, http.StatusOK)
@@ -56,15 +56,17 @@ func (s *Suite) TestCreateQuery(c *check.C) {
 	c.Assert(err, check.IsNil)
 
 	c.Assert(responseQuery.TicketID, check.Equals, query.TicketID)
-	c.Assert(responseQuery.Status, check.Equals, "pending")
+	c.Assert(responseQuery.Status, check.Equals, "Ready")
 	c.Assert(responseQuery.Query, check.Equals, query.Query)
 
 }
 
 func (s *Suite) TestDeleteQuery(c *check.C) {
 	query := &models.Query{
-		TicketID: "pipelineDelete",
-		Query:    "SELECT * FROM TABLE;",
+		TicketID:   "pipelineDelete",
+		Query:      "SELECT * FROM XTABLE;",
+		ServerName: "server1",
+		Status:     "Ready",
 	}
 
 	queryBytes, err := query.Byte()
@@ -75,12 +77,15 @@ func (s *Suite) TestDeleteQuery(c *check.C) {
 
 	c.Assert(response.Code, check.Equals, http.StatusOK)
 
-	req, _ = http.NewRequest("DELETE", fmt.Sprintf("/v1/query/%s", query.Id), nil)
+	err = query.Parse(response.Body)
+	c.Assert(err, check.IsNil)
+
+	req, _ = http.NewRequest("DELETE", fmt.Sprintf("/v1/query/%s", query.Id.Hex()), nil)
 	response = s.executeRequest(req)
 
 	c.Assert(response.Code, check.Equals, http.StatusOK)
 
-	req, _ = http.NewRequest("DELETE", fmt.Sprintf("/v1/query/%s", query.Id), nil)
+	req, _ = http.NewRequest("DELETE", fmt.Sprintf("/v1/query/%s", query.Id.Hex()), nil)
 	response = s.executeRequest(req)
 
 	c.Assert(response.Code, check.Equals, http.StatusNotFound)
@@ -88,8 +93,10 @@ func (s *Suite) TestDeleteQuery(c *check.C) {
 
 func (s *Suite) TestUpdateQuery(c *check.C) {
 	query := &models.Query{
-		TicketID: "pipelineUpdate",
-		Query:    "SELECT * FROM TABLE;",
+		TicketID:   "pipelineUpdate",
+		Query:      "SELECT * FROM XTABLE;",
+		ServerName: "server1",
+		Status:     "Ready",
 	}
 
 	queryBytes, err := query.Byte()
@@ -108,9 +115,9 @@ func (s *Suite) TestUpdateQuery(c *check.C) {
 
 	err = json.Unmarshal(p, responseQuery)
 	c.Assert(err, check.IsNil)
-	// Update pipeline
+	// Update Query
 
-	responseQuery.Query = "SELECT * FROM TABLE2;"
+	responseQuery.Query = "SELECT * FROM TABLEXXX;"
 
 	queryBytes, err = responseQuery.Byte()
 	c.Assert(err, check.IsNil)
@@ -119,8 +126,8 @@ func (s *Suite) TestUpdateQuery(c *check.C) {
 
 	c.Assert(response.Code, check.Equals, http.StatusOK)
 
-	// Get Pipeline
-	req, _ = http.NewRequest("GET", fmt.Sprintf("/v1/query/%s", responseQuery.Id), nil)
+	// Get Query
+	req, _ = http.NewRequest("GET", fmt.Sprintf("/v1/query/%s", responseQuery.Id.Hex()), nil)
 	response = s.executeRequest(req)
 
 	c.Assert(response.Code, check.Equals, http.StatusOK)

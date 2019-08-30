@@ -214,7 +214,6 @@ export default class QueryNew extends React.Component {
                             name="query"
                             label="SQL Query"
                             showLineNumbers
-                            onChange={this.handleChange}
                             language="sql"
                             style={atomDark}
                             children={this.state.query}

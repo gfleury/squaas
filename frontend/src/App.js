@@ -44,7 +44,9 @@ function App() {
         <Route path="/queries/new"
           render={(props) => <QueryNew dbApi={dbApi} api={api} {...props} />}
         />
-        <Route path="/queries/edit/:id" component={QueryEdit} />
+        <Route path="/queries/edit/:id"
+          render={(props) => <QueryEdit dbApi={dbApi} api={api} {...props} />}
+        />
       </Router>
     </div >
   );

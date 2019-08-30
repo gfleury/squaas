@@ -13,7 +13,7 @@ import Grid from '@material-ui/core/Grid';
 
 import EditIcon from '@material-ui/icons/Edit';
 
-
+import Moment from 'react-moment';
 
 export default class QueryList extends React.Component {
 
@@ -56,6 +56,7 @@ export default class QueryList extends React.Component {
                                 <TableCell align="center">Ticket ID</TableCell>
                                 <TableCell align="center">Status</TableCell>
                                 <TableCell align="right">Owner</TableCell>
+                                <TableCell align="right">Last update at</TableCell>
                                 <TableCell align="right">Query behavior</TableCell>
                             </TableRow>
                         </TableHead>
@@ -64,7 +65,7 @@ export default class QueryList extends React.Component {
                                 <TableRow hover
                                     key={query.id}>
                                     <TableCell component="th" align="left">
-                                        <Link to={`${this.props.match.url}/${query.id}`}>
+                                        <Link to={`${this.props.match.url}/edit/${query.id}`}>
                                             <EditIcon className={this.classes.rightIcon} />
                                         </Link>
                                     </TableCell>
@@ -73,6 +74,7 @@ export default class QueryList extends React.Component {
                                     </TableCell>
                                     <TableCell align="center">{query.status}</TableCell>
                                     <TableCell align="right">{query.owner.name}</TableCell>
+                                    <TableCell align="right"><Moment fromNow>{query.updatedAt}</Moment></TableCell>
                                     <TableCell align="right">{query.hastransaction}</TableCell>
                                 </TableRow>
                             ))}

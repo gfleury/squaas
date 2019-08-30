@@ -92,6 +92,13 @@ var routes = Routes{
 	},
 
 	Route{
+		"GetQueryById",
+		strings.ToUpper("Get"),
+		"/v1/query/:queryId",
+		GetQueryById,
+	},
+
+	Route{
 		"AddQuery",
 		strings.ToUpper("Post"),
 		"/v1/query",
@@ -101,43 +108,36 @@ var routes = Routes{
 	Route{
 		"ApproveQuery",
 		strings.ToUpper("Post"),
-		"/v1/query/approve/{queryId}",
+		"/v1/query/:queryId/approve",
 		ApproveQuery,
 	},
 
 	Route{
 		"DeleteApprovalQuery",
 		strings.ToUpper("Delete"),
-		"/v1/query/approve/{queryId}",
+		"/v1/query/:queryId/approve",
 		DeleteApprovalQuery,
 	},
 
 	Route{
 		"DeleteQuery",
 		strings.ToUpper("Delete"),
-		"/v1/query/{queryId}",
+		"/v1/query/:queryId",
 		DeleteQuery,
 	},
 
 	Route{
 		"FindQueryByOwner",
 		strings.ToUpper("Get"),
-		"/v1/query/findByOwner",
+		"/v1/search/query/findByOwner",
 		FindQueryByOwner,
 	},
 
 	Route{
 		"FindQueryByStatus",
 		strings.ToUpper("Get"),
-		"/v1/query/findByStatus",
+		"/v1/search/query/findByStatus",
 		FindQueryByStatus,
-	},
-
-	Route{
-		"GetQueryById",
-		strings.ToUpper("Get"),
-		"/v1/query/{queryId}",
-		GetQueryById,
 	},
 
 	Route{

@@ -76,7 +76,7 @@
       obj = obj || new exports();
 
       if (data.hasOwnProperty('id')) {
-        obj['id'] = ApiClient.convertToType(data['id'], 'Number');
+        obj['id'] = ApiClient.convertToType(data['id'], 'String');
       }
       if (data.hasOwnProperty('ticketid')) {
         obj['ticketid'] = ApiClient.convertToType(data['ticketid'], 'String');
@@ -110,6 +110,12 @@
       }
       if (data.hasOwnProperty('status')) {
         obj['status'] = ApiClient.convertToType(data['status'], 'String');
+      }
+      if (data.hasOwnProperty('createdAt')) {
+        obj['createdAt'] = ApiClient.convertToType(data['createdAt'], 'String');
+      }
+      if (data.hasOwnProperty('updatedAt')) {
+        obj['updatedAt'] = ApiClient.convertToType(data['updatedAt'], 'String');
       }
     }
     return obj;
@@ -164,7 +170,16 @@
    * @member {module:model/Query.StatusEnum} status
    */
   exports.prototype['status'] = undefined;
-
+  /**
+   * query status in the store
+   * @member {module:model/Query.StatusEnum} status
+   */
+  exports.prototype['createdAt'] = undefined;
+  /**
+   * query status in the store
+   * @member {module:model/Query.StatusEnum} status
+   */
+  exports.prototype['updatedAt'] = undefined;
 
   /**
    * Allowed values for the <code>status</code> property.
