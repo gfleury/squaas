@@ -8,9 +8,9 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/gfleury/dbquerybench/api"
-	"github.com/gfleury/dbquerybench/config"
-	"github.com/gfleury/dbquerybench/db"
+	"github.com/gfleury/squaas/api"
+	"github.com/gfleury/squaas/config"
+	"github.com/gfleury/squaas/db"
 )
 
 func main() {

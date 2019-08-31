@@ -10,7 +10,7 @@ func (s *S) TestStorageInit(c *check.C) {
 
 	c.Check(err, check.IsNil)
 
-	names, err := DBStorage.Connection().Session.DB("dbquerybenchtest").CollectionNames()
+	names, err := DBStorage.Connection().Session.DB("squaastest").CollectionNames()
 	c.Check(err, check.IsNil)
 	c.Check(names, check.DeepEquals, []string{"queries"})
 }

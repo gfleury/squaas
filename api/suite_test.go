@@ -6,8 +6,8 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/gfleury/dbquerybench/config"
-	"github.com/gfleury/dbquerybench/db"
+	"github.com/gfleury/squaas/config"
+	"github.com/gfleury/squaas/db"
 
 	"github.com/gin-gonic/gin"
 	check "gopkg.in/check.v1"

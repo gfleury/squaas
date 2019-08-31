@@ -12,9 +12,9 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/gfleury/dbquerybench/config"
-	"github.com/gfleury/dbquerybench/db"
-	"github.com/gfleury/dbquerybench/models"
+	"github.com/gfleury/squaas/config"
+	"github.com/gfleury/squaas/db"
+	"github.com/gfleury/squaas/models"
 )
 
 func Index(c *gin.Context) {

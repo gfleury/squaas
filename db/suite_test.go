@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"testing"
 
-	"github.com/gfleury/dbquerybench/config"
+	"github.com/gfleury/squaas/config"
 
 	"gopkg.in/check.v1"
 )
@@ -21,7 +21,7 @@ func (s *S) SetUpSuite(c *check.C) {
 
 	var yamlExample = []byte(`
 mongo:
-  url: "mongodb://127.0.0.1:27017/dbquerybenchtest"
+  url: "mongodb://127.0.0.1:27017/squaastest"
 `)
 
 	err := config.GetConfig().ReadConfig(bytes.NewBuffer(yamlExample))
@@ -38,6 +38,6 @@ func (s *S) TearDownTest(c *check.C) {
 }
 
 func (s *S) TearDownSuite(c *check.C) {
-	err := DBStorage.Connection().Session.DB("dbquerybenchtest").DropDatabase()
+	err := DBStorage.Connection().Session.DB("squaastest").DropDatabase()
 	c.Check(err, check.IsNil)
 }

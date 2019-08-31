@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/gfleury/dbquerybench/models"
+	"github.com/gfleury/squaas/models"
 	"io/ioutil"
 	"net/http"
 	// "net/url"

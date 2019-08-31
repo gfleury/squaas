@@ -12,8 +12,8 @@ import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 
-	"github.com/gfleury/dbquerybench/auth"
-	"github.com/gfleury/dbquerybench/config"
+	"github.com/gfleury/squaas/auth"
+	"github.com/gfleury/squaas/config"
 )
 
 type Route struct {

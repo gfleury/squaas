@@ -3,7 +3,7 @@ package auth
 import (
 	"gopkg.in/check.v1"
 
-	"github.com/gfleury/dbquerybench/config"
+	"github.com/gfleury/squaas/config"
 )
 
 func (s *S) TestGetConfigCredentials(c *check.C) {

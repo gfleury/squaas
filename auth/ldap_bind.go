@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/gfleury/dbquerybench/config"
+	"github.com/gfleury/squaas/config"
 	"github.com/jtblin/go-ldap-client"
 	"github.com/pkg/errors"
 

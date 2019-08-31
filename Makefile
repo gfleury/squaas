@@ -22,3 +22,13 @@ clean:
 lint:
 	go get -u github.com/golangci/golangci-lint/cmd/golangci-lint
 	golangci-lint run
+
+frontend/test:
+	cd frontend && \
+	npm install && \
+	echo npm run test
+
+frontend/build:
+	cd frontend && \
+	npm install && \
+	npm run build
