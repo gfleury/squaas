@@ -73,6 +73,12 @@ func (q *Query) Parse(bodyReader io.Reader) error {
 }
 
 func (q *Query) AddApproval(u *User, approve bool) {
+	for id, approval := range q.Approvals {
+		if approval.User.Name == u.Name {
+			q.Approvals[id].Approved = approve
+			return
+		}
+	}
 	q.Approvals = append(q.Approvals, Approvals{u, approve})
 }
 

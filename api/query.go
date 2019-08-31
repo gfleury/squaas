@@ -9,6 +9,7 @@ import (
 	"gopkg.in/mgo.v2/bson"
 	"log"
 	"net/http"
+	"sort"
 
 	"github.com/gin-gonic/gin"
 
@@ -52,11 +53,7 @@ func AddQuery(c *gin.Context) {
 		return
 	}
 
-	ownerUser, _, ok := c.Request.BasicAuth()
-
-	if !ok {
-		c.JSON(http.StatusForbidden, gin.H{"error": "You must be authenticated"})
-	}
+	ownerUser := c.MustGet(gin.AuthUserKey).(string)
 
 	query.Owner.Name = ownerUser
 
@@ -168,7 +165,7 @@ func ApproveQuery(c *gin.Context) {
 		return
 	}
 
-	userApproving, _, _ := c.Request.BasicAuth()
+	userApproving := c.MustGet(gin.AuthUserKey).(string)
 
 	query.AddApproval(&models.User{Name: userApproving}, true)
 
@@ -200,7 +197,7 @@ func DeleteApprovalQuery(c *gin.Context) {
 		return
 	}
 
-	userApproving, _, _ := c.Request.BasicAuth()
+	userApproving := c.MustGet(gin.AuthUserKey).(string)
 
 	query.AddApproval(&models.User{Name: userApproving}, false)
 
@@ -260,11 +257,7 @@ func UpdateQuery(c *gin.Context) {
 		return
 	}
 
-	requestingUser, _, ok := c.Request.BasicAuth()
-
-	if !ok {
-		c.JSON(http.StatusForbidden, gin.H{"error": "You must be authenticated"})
-	}
+	requestingUser := c.MustGet(gin.AuthUserKey).(string)
 
 	QueryDB := db.DBStorage.Connection().Model("Query")
 
@@ -304,6 +297,10 @@ func GetDatabases(c *gin.Context) {
 	for server := range databases {
 		servers = append(servers, models.Server{Name: server})
 	}
+
+	sort.Slice(servers, func(i, j int) bool {
+		return servers[i].Name < servers[j].Name
+	})
 
 	c.JSON(http.StatusOK, servers)
 }
