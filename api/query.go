@@ -49,7 +49,17 @@ func AddQuery(c *gin.Context) {
 
 	err := c.BindJSON(&query)
 	if err != nil {
-		c.JSON(http.StatusMethodNotAllowed, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	if !query.Status.Valid() {
+		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("Invalid status: %s", query.Status)})
+		return
+	}
+
+	if query.Status != models.StatusReady && query.Status != models.StatusPending {
+		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("Queries can only be created in Pending and Ready status, invalid status: %s", query.Status)})
 		return
 	}
 
@@ -134,6 +144,11 @@ func DeleteQuery(c *gin.Context) {
 
 	if query.Deleted {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Query not found"})
+		return
+	}
+
+	if query.Status != models.StatusReady && query.Status != models.StatusPending {
+		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("Queries can only be deleted in Pending and Ready status, invalid status for deleting: %s", query.Status)})
 		return
 	}
 

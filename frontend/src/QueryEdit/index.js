@@ -34,7 +34,7 @@ export default class QueryEdit extends React.Component {
             parseText: "",
             id: props.match.params.id,
             server: "",
-            status: "Ready",
+            status: "ready",
             ticketid: "",
             query: "",
             owner: "",

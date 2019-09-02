@@ -4,12 +4,14 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/gfleury/squaas/models"
 	"io/ioutil"
 	"net/http"
 	"strings"
 
 	check "gopkg.in/check.v1"
+
+	"github.com/gfleury/squaas/db"
+	"github.com/gfleury/squaas/models"
 )
 
 func (s *Suite) TestCreateQuery(c *check.C) {
@@ -17,7 +19,7 @@ func (s *Suite) TestCreateQuery(c *check.C) {
 		TicketID:   "BLEH-330",
 		Query:      "SELECT * FROM XTABLE;",
 		ServerName: "server1",
-		Status:     "Ready",
+		Status:     models.StatusReady,
 	}
 
 	queryBytes, err := query.Byte()
@@ -37,7 +39,7 @@ func (s *Suite) TestCreateQuery(c *check.C) {
 	c.Assert(err, check.IsNil)
 
 	c.Assert(responseQuery.TicketID, check.Equals, query.TicketID)
-	c.Assert(responseQuery.Status, check.Equals, "Ready")
+	c.Assert(responseQuery.Status, check.Equals, models.StatusReady)
 	c.Assert(responseQuery.Query, check.Equals, query.Query)
 	c.Assert(responseQuery.ServerName, check.Equals, query.ServerName)
 	c.Assert(responseQuery.Owner, check.Equals, models.User{Name: "admin"})
@@ -56,9 +58,27 @@ func (s *Suite) TestCreateQuery(c *check.C) {
 	c.Assert(err, check.IsNil)
 
 	c.Assert(responseQuery.TicketID, check.Equals, query.TicketID)
-	c.Assert(responseQuery.Status, check.Equals, "Ready")
+	c.Assert(responseQuery.Status, check.Equals, models.StatusReady)
 	c.Assert(responseQuery.Query, check.Equals, query.Query)
 	c.Assert(responseQuery.Owner, check.Equals, models.User{Name: "admin"})
+}
+
+func (s *Suite) TestCreateQueryInvalidStatus(c *check.C) {
+	query := &models.Query{
+		TicketID:   "BLEH-330",
+		Query:      "SELECT * FROM XTABLE;",
+		ServerName: "server1",
+		Status:     models.StatusApproved,
+	}
+
+	queryBytes, err := query.Byte()
+	c.Assert(err, check.IsNil)
+
+	req, _ := http.NewRequest("POST", "/v1/query", bytes.NewReader(queryBytes))
+	response := s.executeRequest(req)
+
+	c.Assert(response.Code, check.Equals, http.StatusBadRequest)
+
 }
 
 func (s *Suite) TestDeleteQuery(c *check.C) {
@@ -66,7 +86,7 @@ func (s *Suite) TestDeleteQuery(c *check.C) {
 		TicketID:   "pipelineDelete",
 		Query:      "SELECT * FROM XTABLE;",
 		ServerName: "server1",
-		Status:     "Ready",
+		Status:     models.StatusReady,
 	}
 
 	queryBytes, err := query.Byte()
@@ -91,12 +111,49 @@ func (s *Suite) TestDeleteQuery(c *check.C) {
 	c.Assert(response.Code, check.Equals, http.StatusNotFound)
 }
 
+func (s *Suite) TestDeleteQueryInvalidStatus(c *check.C) {
+	query := &models.Query{
+		TicketID:   "BLEH-330",
+		Query:      "SELECT * FROM XTABLE;",
+		ServerName: "server1",
+		Status:     models.StatusReady,
+	}
+
+	queryBytes, err := query.Byte()
+	c.Assert(err, check.IsNil)
+
+	req, _ := http.NewRequest("POST", "/v1/query", bytes.NewReader(queryBytes))
+	response := s.executeRequest(req)
+	c.Assert(response.Code, check.Equals, http.StatusOK)
+
+	var p []byte
+	p, err = ioutil.ReadAll(response.Body)
+	c.Assert(err, check.IsNil)
+
+	responseQuery := &models.Query{}
+	err = json.Unmarshal(p, responseQuery)
+	c.Assert(err, check.IsNil)
+
+	QueryDB := db.DBStorage.Connection().Model("Query")
+	err = QueryDB.FindId(responseQuery.Id).Exec(query)
+	c.Assert(err, check.IsNil)
+
+	query.Status = models.StatusApproved
+	err = query.Save()
+	c.Assert(err, check.IsNil)
+
+	req, _ = http.NewRequest("DELETE", fmt.Sprintf("/v1/query/%s", query.Id.Hex()), nil)
+	response = s.executeRequest(req)
+
+	c.Assert(response.Code, check.Equals, http.StatusBadRequest)
+}
+
 func (s *Suite) TestUpdateQuery(c *check.C) {
 	query := &models.Query{
 		TicketID:   "pipelineUpdate",
 		Query:      "SELECT * FROM XTABLE;",
 		ServerName: "server1",
-		Status:     "Ready",
+		Status:     models.StatusReady,
 	}
 
 	queryBytes, err := query.Byte()
@@ -169,7 +226,7 @@ func (s *Suite) TestApproveQuery(c *check.C) {
 		TicketID:   "BLEH-330",
 		Query:      "SELECT * FROM XTABLE;",
 		ServerName: "server1",
-		Status:     "Ready",
+		Status:     models.StatusReady,
 	}
 
 	queryBytes, err := query.Byte()
@@ -206,7 +263,7 @@ func (s *Suite) TestApproveQuery(c *check.C) {
 	c.Assert(err, check.IsNil)
 
 	c.Assert(responseQuery.TicketID, check.Equals, query.TicketID)
-	c.Assert(responseQuery.Status, check.Equals, "Ready")
+	c.Assert(responseQuery.Status, check.Equals, models.StatusReady)
 	c.Assert(responseQuery.Query, check.Equals, query.Query)
 	c.Assert(responseQuery.ServerName, check.Equals, query.ServerName)
 	c.Assert(responseQuery.Owner, check.Equals, models.User{Name: "admin"})
@@ -230,7 +287,7 @@ func (s *Suite) TestApproveQuery(c *check.C) {
 	c.Assert(err, check.IsNil)
 
 	c.Assert(responseQuery.TicketID, check.Equals, query.TicketID)
-	c.Assert(responseQuery.Status, check.Equals, "Ready")
+	c.Assert(responseQuery.Status, check.Equals, models.StatusReady)
 	c.Assert(responseQuery.Query, check.Equals, query.Query)
 	c.Assert(responseQuery.ServerName, check.Equals, query.ServerName)
 	c.Assert(responseQuery.Owner, check.Equals, models.User{Name: "admin"})

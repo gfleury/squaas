@@ -30,7 +30,7 @@ export default class QueryNew extends React.Component {
             includedId: 0,
             parseText: "",
             server: "",
-            status: "Ready",
+            status: "ready",
             ticketid: "",
             query: "-- SQL Query\n-- Paste it here\nSELECT * FROM XTABLE;",
         };
@@ -165,8 +165,8 @@ export default class QueryNew extends React.Component {
                                 onChange={this.handleChange}
                                 input={<Input name="status" id="status" />}
                             >
-                                <MenuItem value="OnHold">On Hold</MenuItem>
-                                <MenuItem value="Ready">Ready</MenuItem>
+                                <MenuItem value="pending">On Hold</MenuItem>
+                                <MenuItem value="ready">Ready</MenuItem>
                             </Select>
                             <FormHelperText>Select the query state</FormHelperText>
                         </FormControl>

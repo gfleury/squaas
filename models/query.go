@@ -15,6 +15,17 @@ import (
 	"github.com/zebresel-com/mongodm"
 )
 
+type Status string
+
+const (
+	StatusReady    Status = "ready"
+	StatusDone     Status = "done"
+	StatusPending  Status = "pending"
+	StatusApproved Status = "approved"
+	StatusRunning  Status = "running"
+	StatusFailed   Status = "failed"
+)
+
 type Approvals struct {
 	User     *User `json:"user" bson:"user"`
 	Approved bool  `json:"approved" bson:"approved"`
@@ -31,7 +42,7 @@ type Query struct {
 
 	Query string `json:"query" bson:"query"`
 
-	Status string `json:"status" bson:"status"`
+	Status Status `json:"status" bson:"status"`
 
 	Approvals []Approvals `json:"approvals" bson:"approvals"`
 
@@ -126,4 +137,23 @@ var validID = regexp.MustCompile(`^[0-9a-fA-F]{24}$`)
 
 func IsValidObjectId(id string) bool {
 	return validID.MatchString(id)
+}
+
+func (s Status) Valid() bool {
+	switch s {
+	case StatusReady:
+		return true
+	case StatusDone:
+		return true
+	case StatusPending:
+		return true
+	case StatusApproved:
+		return true
+	case StatusRunning:
+		return true
+	case StatusFailed:
+		return true
+	default:
+		return false
+	}
 }

@@ -92,7 +92,7 @@ func (s *Storage) Init() error {
 	}
 
 	index = mgo.Index{
-		Key:        []string{"status", "owner", "ticketid"},
+		Key:        []string{"status", "owner", "ticketid", "approvals.user"},
 		Background: true,
 		Sparse:     true,
 	}
