@@ -2,9 +2,12 @@ language: go
 install: true
 services:
   - mongodb
+  - postgresql
 go:
   - 1.10.x
   - master
+before_script:
+  - psql -c 'create database data;' -U postgres
 script:
   - 'make ${JOB}'
 env:
