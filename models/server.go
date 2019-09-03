@@ -14,12 +14,19 @@ import (
 	"encoding/json"
 	"io"
 	"io/ioutil"
+	"sort"
+
+	"github.com/gfleury/squaas/config"
 )
 
 type Server struct {
 	Name string `json:"name" bson:"name"`
 
 	Uri string `json:"uri,omitempty" bson:"uri"`
+
+	FailedRetries int
+
+	LastErrors []string
 }
 
 type Servers []Server
@@ -52,4 +59,22 @@ func (u *Server) Parse(bodyReader io.Reader) error {
 	}
 
 	return json.Unmarshal(body, u)
+}
+
+func GetDatabases(allData bool) Servers {
+	databases := config.GetConfig().GetStringMapString("databases")
+	servers := Servers{}
+
+	for server := range databases {
+		database := Server{Name: server}
+		if allData {
+			database.Uri = databases[server]
+		}
+		servers = append(servers, database)
+	}
+
+	sort.Slice(servers, func(i, j int) bool {
+		return servers[i].Name < servers[j].Name
+	})
+	return servers
 }

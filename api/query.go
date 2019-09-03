@@ -9,11 +9,9 @@ import (
 	"gopkg.in/mgo.v2/bson"
 	"log"
 	"net/http"
-	"sort"
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/gfleury/squaas/config"
 	"github.com/gfleury/squaas/db"
 	"github.com/gfleury/squaas/models"
 )
@@ -316,16 +314,7 @@ func UpdateQuery(c *gin.Context) {
 }
 
 func GetDatabases(c *gin.Context) {
-	databases := config.GetConfig().GetStringMapString("databases")
-	servers := models.Servers{}
-
-	for server := range databases {
-		servers = append(servers, models.Server{Name: server})
-	}
-
-	sort.Slice(servers, func(i, j int) bool {
-		return servers[i].Name < servers[j].Name
-	})
+	servers := models.GetDatabases(false)
 
 	c.JSON(http.StatusOK, servers)
 }

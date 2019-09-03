@@ -1,7 +1,7 @@
 package executors
 
 type Executor interface {
-	Init() error
+	Init(interface{}) (interface{}, error)
 	Run() (interface{}, error)
 	SetData(interface{}) error
 }
