@@ -58,7 +58,7 @@ func AddQuery(c *gin.Context) {
 		return
 	}
 
-	if query.Status != models.StatusReady && query.Status != models.StatusPending {
+	if query.Status != models.StatusReady && query.Status != models.StatusPending && query.Status != models.StatusParseOnly {
 		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("Queries can only be created in Pending and Ready status, invalid status: %s", query.Status)})
 		return
 	}
@@ -79,7 +79,7 @@ func AddQuery(c *gin.Context) {
 		return
 	}
 
-	if query.Status == "PARSEONLY" {
+	if query.Status == models.StatusParseOnly {
 		c.JSON(http.StatusOK, query)
 		return
 	}
@@ -180,6 +180,11 @@ func ApproveQuery(c *gin.Context) {
 		return
 	}
 
+	if query.Status != models.StatusReady {
+		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("You can only approve while the query is in Ready status, not in %s", query.Status)})
+		return
+	}
+
 	userApproving := c.MustGet(gin.AuthUserKey).(string)
 
 	query.AddApproval(&models.User{Name: userApproving}, true)
@@ -209,6 +214,11 @@ func DeleteApprovalQuery(c *gin.Context) {
 
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		return
+	}
+
+	if query.Status != models.StatusReady {
+		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("You can only disapprove while the query is in Ready status, not in %s", query.Status)})
 		return
 	}
 
@@ -272,8 +282,6 @@ func UpdateQuery(c *gin.Context) {
 		return
 	}
 
-	requestingUser := c.MustGet(gin.AuthUserKey).(string)
-
 	QueryDB := db.DBStorage.Connection().Model("Query")
 
 	err = QueryDB.FindId(queryUpdated.GetId()).Exec(&queryOriginal)
@@ -282,6 +290,8 @@ func UpdateQuery(c *gin.Context) {
 		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
 		return
 	}
+
+	requestingUser := c.MustGet(gin.AuthUserKey).(string)
 
 	if requestingUser != queryOriginal.Owner.Name {
 		c.JSON(http.StatusForbidden, gin.H{"error": "You must have ownership to be able to update it"})

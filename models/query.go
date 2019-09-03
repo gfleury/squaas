@@ -18,17 +18,24 @@ import (
 type Status string
 
 const (
-	StatusReady    Status = "ready"
-	StatusDone     Status = "done"
-	StatusPending  Status = "pending"
-	StatusApproved Status = "approved"
-	StatusRunning  Status = "running"
-	StatusFailed   Status = "failed"
+	StatusReady     Status = "ready"
+	StatusDone      Status = "done"
+	StatusPending   Status = "pending"
+	StatusApproved  Status = "approved"
+	StatusRunning   Status = "running"
+	StatusFailed    Status = "failed"
+	StatusParseOnly Status = "PARSEONLY"
 )
 
 type Approvals struct {
 	User     *User `json:"user" bson:"user"`
 	Approved bool  `json:"approved" bson:"approved"`
+}
+
+type Result struct {
+	AffectedRows int    `json:"affectedrows" bson:"affectedrows"`
+	Success      bool   `json:"success" bson:"success"`
+	Status       string `json:"status" bson:"status"`
 }
 
 type Query struct {
@@ -57,6 +64,8 @@ type Query struct {
 	HasAlter bool `json:"hasalter,omitempty" bson:"hasalter"`
 
 	HasTransaction bool `json:"hastransaction,omitempty" bson:"hastransaction"`
+
+	Result Result `json:"result,omitempty" bson:"result"`
 }
 
 func (q *Query) Byte() (objBytes []byte, err error) {
@@ -64,8 +73,19 @@ func (q *Query) Byte() (objBytes []byte, err error) {
 }
 
 func (q *Query) Merge(eq *Query) (err error) {
-	q.TicketID = eq.TicketID
-	q.Query = eq.Query
+	if q.Status == StatusPending {
+		q.TicketID = eq.TicketID
+		q.Query = eq.Query
+		q.Status = eq.Status
+	}
+
+	if q.Status == StatusReady {
+		if eq.Status == StatusPending {
+			q.Approvals = nil
+		}
+		q.Status = eq.Status
+	}
+
 	return q.LintSQLQuery()
 }
 
@@ -152,6 +172,8 @@ func (s Status) Valid() bool {
 	case StatusRunning:
 		return true
 	case StatusFailed:
+		return true
+	case StatusParseOnly:
 		return true
 	default:
 		return false

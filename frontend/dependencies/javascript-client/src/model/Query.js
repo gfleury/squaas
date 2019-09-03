@@ -17,18 +17,18 @@
 (function (root, factory) {
   if (typeof define === 'function' && define.amd) {
     // AMD. Register as an anonymous module.
-    define(['../ApiClient', '../model/QueryApprovals', '../model/User'], factory);
+    define(['../ApiClient', '../model/QueryApprovals', '../model/QueryResult', '../model/User'], factory);
   } else if (typeof module === 'object' && module.exports) {
     // CommonJS-like environments that support module.exports, like Node.
-    module.exports = factory(require('../ApiClient'), require('./QueryApprovals'), require('./User'));
+    module.exports = factory(require('../ApiClient'), require('./QueryApprovals'), require('./QueryResult'), require('./User'));
   } else {
     // Browser globals (root is window)
     if (!root.DBqueryBench) {
       root.DBqueryBench = {};
     }
-    root.DBqueryBench.Query = factory(root.DBqueryBench.ApiClient, root.DBqueryBench.QueryApprovals, root.DBqueryBench.User);
+    root.DBqueryBench.Query = factory(root.DBqueryBench.ApiClient, root.DBqueryBench.QueryApprovals, root.DBqueryBench.QueryResult, root.DBqueryBench.User);
   }
-}(this, function (ApiClient, QueryApprovals, User) {
+}(this, function (ApiClient, QueryApprovals, QueryResult, User) {
   'use strict';
 
 
@@ -84,6 +84,9 @@
       if (data.hasOwnProperty('approvals')) {
         obj['approvals'] = ApiClient.convertToType(data['approvals'], [QueryApprovals]);
       }
+      if (data.hasOwnProperty('result')) {
+        obj['result'] = ApiClient.convertToType(data['result'], QueryResult);
+      }
       if (data.hasOwnProperty('owner')) {
         obj['owner'] = User.constructFromObject(data['owner']);
       }
@@ -136,6 +139,10 @@
    * @member {Array.<module:model/QueryApprovals>} approvals
    */
   exports.prototype['approvals'] = undefined;
+  /**
+   * @member {Array.<module:model/QueryResult>} result
+   */
+  exports.prototype['result'] = undefined;
   /**
    * @member {module:model/User} owner
    */

@@ -219,17 +219,19 @@ export default class QueryEdit extends React.Component {
                         />
                     </Grid>
                     <Grid item xs={6} sm={3}>
-                        <TextField
-                            disabled
-                            id="outlined-name"
-                            label="Status"
-                            name="status"
-                            className={this.classes.textField}
-                            value={this.state.status}
-                            onChange={this.handleChange}
-                            margin="normal"
-                            variant="outlined"
-                        />
+                        <FormControl className={this.classes.formControl}>
+                            <InputLabel htmlFor="status">Query State</InputLabel>
+                            <Select
+                                required
+                                value={this.state.status}
+                                onChange={this.handleChange}
+                                input={<Input name="status" id="status" />}
+                            >
+                                <MenuItem value="pending">On Hold</MenuItem>
+                                <MenuItem value="ready">Ready</MenuItem>
+                            </Select>
+                            <FormHelperText>Select the query state</FormHelperText>
+                        </FormControl>
                     </Grid>
                     <Grid item xs={6} sm={3}>
                         <TextField

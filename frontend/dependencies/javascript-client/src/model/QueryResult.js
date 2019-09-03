@@ -17,16 +17,16 @@
 (function (root, factory) {
   if (typeof define === 'function' && define.amd) {
     // AMD. Register as an anonymous module.
-    define(['../ApiClient', '../model/User'], factory);
+    define(['../ApiClient'], factory);
   } else if (typeof module === 'object' && module.exports) {
     // CommonJS-like environments that support module.exports, like Node.
-    module.exports = factory(require('../ApiClient'), require('./User'));
+    module.exports = factory(require('../ApiClient'));
   } else {
     // Browser globals (root is window)
     if (!root.DBqueryBench) {
       root.DBqueryBench = {};
     }
-    root.DBqueryBench.QueryApprovals = factory(root.DBqueryBench.ApiClient, root.DBqueryBench.User);
+    root.DBqueryBench.QueryResults = factory(root.DBqueryBench.ApiClient);
   }
 }(this, function (ApiClient, User) {
   'use strict';
@@ -35,14 +35,14 @@
 
 
   /**
-   * The QueryApprovals model module.
-   * @module model/QueryApprovals
+   * The QueryResult model module.
+   * @module model/QueryResult
    * @version 1.0.0
    */
 
   /**
-   * Constructs a new <code>QueryApprovals</code>.
-   * @alias module:model/QueryApprovals
+   * Constructs a new <code>QueryResult</code>.
+   * @alias module:model/QueryResult
    * @class
    */
   var exports = function () {
@@ -53,34 +53,41 @@
   };
 
   /**
-   * Constructs a <code>QueryApprovals</code> from a plain JavaScript object, optionally creating a new instance.
+   * Constructs a <code>QueryResult</code> from a plain JavaScript object, optionally creating a new instance.
    * Copies all relevant properties from <code>data</code> to <code>obj</code> if supplied or a new instance if not.
    * @param {Object} data The plain JavaScript object bearing properties of interest.
-   * @param {module:model/QueryApprovals} obj Optional instance to populate.
-   * @return {module:model/QueryApprovals} The populated <code>QueryApprovals</code> instance.
+   * @param {module:model/QueryResult} obj Optional instance to populate.
+   * @return {module:model/QueryResult} The populated <code>QueryResult</code> instance.
    */
   exports.constructFromObject = function (data, obj) {
     if (data) {
       obj = obj || new exports();
 
-      if (data.hasOwnProperty('user')) {
-        obj['user'] = User.constructFromObject(data['user']);
+      if (data.hasOwnProperty('affectedrows')) {
+        obj['affectedrows'] = ApiClient.convertToType(data['affectedrows'], 'Integer');
       }
-      if (data.hasOwnProperty('approved')) {
-        obj['approved'] = ApiClient.convertToType(data['approved'], 'Boolean');
+      if (data.hasOwnProperty('success')) {
+        obj['success'] = ApiClient.convertToType(data['success'], 'Boolean');
+      }
+      if (data.hasOwnProperty('status')) {
+        obj['status'] = ApiClient.convertToType(data['status'], 'String');
       }
     }
     return obj;
   }
 
   /**
-   * @member {module:model/User} user
+   * @member {Integer} affectedrows
    */
-  exports.prototype['user'] = undefined;
+  exports.prototype['affectedrows'] = undefined;
   /**
-   * @member {Boolean} approve
+   * @member {Boolean} success
    */
-  exports.prototype['approved'] = undefined;
+  exports.prototype['success'] = undefined;
+  /**
+   * @member {String} status
+   */
+  exports.prototype['status'] = undefined;
 
 
 

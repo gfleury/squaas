@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"sync"
+	"sync/atomic"
 	"time"
 )
 
@@ -11,16 +12,31 @@ type BasicWorker struct {
 	DataFeed    func() ([]interface{}, error)
 	DataProcess func(interface{})
 	MaxThreads  int
-	ShouldStop  bool
+	ShouldStop  atomBool
 	MinRunTime  time.Duration
 	startTime   time.Time
 	lastRunTime time.Duration
 	wg          sync.WaitGroup
 }
 
+// https://gist.github.com/mahan/6256149
+type atomBool struct{ flag int32 }
+
+func (b *atomBool) Set(value bool) {
+	var i int32 = 0
+	if value {
+		i = 1
+	}
+	atomic.StoreInt32(&(b.flag), int32(i))
+}
+
+func (b *atomBool) Get() bool {
+	return atomic.LoadInt32(&(b.flag)) != 0
+}
+
 func (w *BasicWorker) Run() {
 
-	for !w.ShouldStop {
+	for !w.ShouldStop.Get() {
 		w.start()
 
 		dataArray, err := w.DataFeed()
@@ -39,8 +55,8 @@ func (w *BasicWorker) Run() {
 			w.wg.Add(1)
 
 			go func(data interface{}) {
-				defer w.wg.Done()
 				w.DataProcess(data)
+				w.wg.Done()
 			}(data)
 		}
 

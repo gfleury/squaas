@@ -20,6 +20,10 @@ func New(conninfo string) *Executor {
 func (e *Executor) Init() (err error) {
 	e.db, err = sql.Open("postgres", e.conninfo)
 
+	if err != nil {
+		return err
+	}
+
 	err = e.db.Ping()
 
 	return err

@@ -153,7 +153,7 @@ func (s *Suite) TestUpdateQuery(c *check.C) {
 		TicketID:   "pipelineUpdate",
 		Query:      "SELECT * FROM XTABLE;",
 		ServerName: "server1",
-		Status:     models.StatusReady,
+		Status:     models.StatusPending,
 	}
 
 	queryBytes, err := query.Byte()
