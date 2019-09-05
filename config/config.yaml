@@ -5,6 +5,9 @@ auth:
       admin: admin
       test: test123
 databases:
-  db.test.com: "postgresql://localhost:5423/blehws"
+  db.test.com: "postgresql://postgres@localhost:5432/blehws?sslmode=disable"
   db.staging.test.com: "postgresql://localhost:5424/blehws"
   db-test: "postgresql://127.0.0.1:5424/blehws"
+flow:
+  minApproved: 1
+  maxDisapproved: 5

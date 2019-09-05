@@ -27,6 +27,9 @@ func (w *QueryWorker) DataFeed() (data []interface{}, err error) {
 	QueryDB := db.DBStorage.Connection().Model("Query")
 
 	err = QueryDB.Find(bson.M{"deleted": false, "status": models.StatusApproved}).Exec(&queries)
+	if err != nil {
+		return data, err
+	}
 
 	data = make([]interface{}, len(queries))
 
@@ -41,7 +44,7 @@ func (w *QueryWorker) DataProcess(data interface{}) {
 	var conninfo *string
 
 	query := data.(*models.Query)
-	log.Printf("Running %s", query.Query)
+	log.Printf("QueryWorker: %s: Preparing for run query", query.Id.Hex())
 
 	servers := models.GetDatabases(true)
 
@@ -53,7 +56,7 @@ func (w *QueryWorker) DataProcess(data interface{}) {
 	}
 
 	if conninfo == nil {
-		log.Printf("Database connection information not found, please update configuration. Server: %s", query.ServerName)
+		log.Printf("QueryWorker: %s: Database connection information not found, please update configuration. Server: %s", query.Id.Hex(), query.ServerName)
 		return
 	}
 
@@ -62,20 +65,20 @@ func (w *QueryWorker) DataProcess(data interface{}) {
 	err := executor.Init()
 
 	if err != nil {
-		log.Printf("Database connection initialization failed, not running. %s", err.Error())
+		log.Printf("QueryWorker: %s: Database connection initialization failed, not running. %s", query.Id.Hex(), err.Error())
 		return
 	}
 
 	err = executor.SetData(query.Query)
 	if err != nil {
-		log.Printf("Database parameter initialization failed, not running. %s", err.Error())
+		log.Printf("QueryWorker: %s: Database parameter initialization failed, not running. %s", query.Id.Hex(), err.Error())
 		return
 	}
 
 	query.Status = models.StatusRunning
 	err = query.Save()
 	if err != nil {
-		log.Printf("Query save failed, not running. %s", err.Error())
+		log.Printf("QueryWorker: %s: Query save failed, not running. %s", query.Id.Hex(), err.Error())
 		return
 	}
 
@@ -84,13 +87,13 @@ func (w *QueryWorker) DataProcess(data interface{}) {
 	query.Result.AffectedRows = 0
 
 	if err != nil {
-		log.Printf("Query failed to run. %s", err.Error())
+		log.Printf("QueryWorker: %s: Query failed to run. %s", query.Id.Hex(), err.Error())
 		query.Status = models.StatusFailed
 		query.Result.Success = false
 		query.Result.Status = err.Error()
 		err = query.Save()
 		if err != nil {
-			log.Printf("Query save after run failure, failed. Query will remain in status 'Running'.")
+			log.Printf("QueryWorker: %s: Query save after run failure, failed. Query will remain in status 'Running'.", query.Id.Hex())
 		}
 		return
 	}
@@ -104,7 +107,7 @@ func (w *QueryWorker) DataProcess(data interface{}) {
 	query.Status = models.StatusDone
 	err = query.Save()
 	if err != nil {
-		log.Printf("Query deleting failed, not running. %s", err.Error())
+		log.Printf("QueryWorker: %s: Query deleting failed, not running. %s", query.Id.Hex(), err.Error())
 		return
 	}
 }

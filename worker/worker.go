@@ -78,9 +78,11 @@ func (w *BasicWorker) end() {
 }
 
 func fmtDuration(d time.Duration) string {
-	d = d.Round(time.Minute)
+	d = d.Round(time.Second)
 	h := d / time.Hour
 	d -= h * time.Hour
 	m := d / time.Minute
-	return fmt.Sprintf("%02d:%02d", h, m)
+	d -= m * time.Minute
+	s := d / time.Second
+	return fmt.Sprintf("%02d:%02d:%02d", h, m, s)
 }
