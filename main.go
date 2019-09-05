@@ -5,14 +5,14 @@
 package main
 
 import (
-	"github.com/gfleury/dbquerybench/config"
+	"github.com/gfleury/squaas/worker"
 	"log"
 	"net/http"
+	"time"
 
-	"github.com/rs/cors"
-
-	"github.com/gfleury/dbquerybench/api"
-	"github.com/gfleury/dbquerybench/db"
+	"github.com/gfleury/squaas/api"
+	"github.com/gfleury/squaas/config"
+	"github.com/gfleury/squaas/db"
 )
 
 func main() {
@@ -23,13 +23,20 @@ func main() {
 		log.Fatal(err)
 	}
 
-	log.Printf("Server started")
+	log.Printf("Starting flow worker")
+	wFlow := worker.NewFlowWorker()
+	wFlow.BasicWorker.MaxThreads = 2
+	wFlow.BasicWorker.MinRunTime = 10 * time.Second
+	go wFlow.Run()
+
+	log.Printf("Starting query workers/executors")
+	w := worker.NewQueryWorker()
+	w.BasicWorker.MaxThreads = 2
+	w.BasicWorker.MinRunTime = 10 * time.Second
+	go w.Run()
 
 	router := api.NewRouter()
-	c := cors.New(cors.Options{
-		AllowedOrigins: []string{"*"},
-		AllowedMethods: []string{"GET", "HEAD", "POST", "PUT", "OPTIONS"},
-	})
 
-	log.Fatal(http.ListenAndServe(":8080", c.Handler(router)))
+	log.Printf("Starting server")
+	log.Fatal(http.ListenAndServe(":8080", router))
 }

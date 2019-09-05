@@ -5,7 +5,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/gfleury/dbquerybench/config"
+	"github.com/gfleury/squaas/config"
 
 	"github.com/bradleypeabody/godap"
 	"gopkg.in/check.v1"

@@ -8,15 +8,34 @@ import (
 	"encoding/json"
 	"io"
 	"io/ioutil"
+	"regexp"
 	"strings"
 
 	"github.com/xwb1989/sqlparser"
 	"github.com/zebresel-com/mongodm"
 )
 
+type Status string
+
+const (
+	StatusReady     Status = "ready"
+	StatusDone      Status = "done"
+	StatusPending   Status = "pending"
+	StatusApproved  Status = "approved"
+	StatusRunning   Status = "running"
+	StatusFailed    Status = "failed"
+	StatusParseOnly Status = "PARSEONLY"
+)
+
 type Approvals struct {
-	User     *User `json:"user,omitempty" bson:"user"`
-	Approved bool  `json:"approved,omitempty" bson:"approved"`
+	User     *User `json:"user" bson:"user"`
+	Approved bool  `json:"approved" bson:"approved"`
+}
+
+type Result struct {
+	AffectedRows int    `json:"affectedrows" bson:"affectedrows"`
+	Success      bool   `json:"success" bson:"success"`
+	Status       string `json:"status" bson:"status"`
 }
 
 type Query struct {
@@ -30,9 +49,9 @@ type Query struct {
 
 	Query string `json:"query" bson:"query"`
 
-	Status string `json:"status,omitempty" bson:"status"`
+	Status Status `json:"status" bson:"status"`
 
-	Approvals []Approvals `json:"approvals,omitempty" bson:"approvals"`
+	Approvals []Approvals `json:"approvals" bson:"approvals"`
 
 	HasSelect bool `json:"hasselect,omitempty" bson:"hasselect"`
 
@@ -45,6 +64,8 @@ type Query struct {
 	HasAlter bool `json:"hasalter,omitempty" bson:"hasalter"`
 
 	HasTransaction bool `json:"hastransaction,omitempty" bson:"hastransaction"`
+
+	Result Result `json:"result,omitempty" bson:"result"`
 }
 
 func (q *Query) Byte() (objBytes []byte, err error) {
@@ -52,9 +73,20 @@ func (q *Query) Byte() (objBytes []byte, err error) {
 }
 
 func (q *Query) Merge(eq *Query) (err error) {
-	q.TicketID = eq.TicketID
-	q.Query = eq.Query
-	return err
+	if q.Status == StatusPending {
+		q.TicketID = eq.TicketID
+		q.Query = eq.Query
+		q.Status = eq.Status
+	}
+
+	if q.Status == StatusReady {
+		if eq.Status == StatusPending {
+			q.Approvals = nil
+		}
+		q.Status = eq.Status
+	}
+
+	return q.LintSQLQuery()
 }
 
 func (q *Query) Parse(bodyReader io.Reader) error {
@@ -72,10 +104,22 @@ func (q *Query) Parse(bodyReader io.Reader) error {
 }
 
 func (q *Query) AddApproval(u *User, approve bool) {
+	for id, approval := range q.Approvals {
+		if approval.User.Name == u.Name {
+			q.Approvals[id].Approved = approve
+			return
+		}
+	}
 	q.Approvals = append(q.Approvals, Approvals{u, approve})
 }
 
 func (q *Query) LintSQLQuery() error {
+	q.HasAlter = false
+	q.HasSelect = false
+	q.HasInsert = false
+	q.HasTransaction = false
+	q.HasDelete = false
+
 	hasBegin := false
 
 	r := strings.NewReader(q.Query)
@@ -102,7 +146,36 @@ func (q *Query) LintSQLQuery() error {
 			}
 		case *sqlparser.Delete:
 			q.HasDelete = true
+		case *sqlparser.DDL:
+			q.HasAlter = true
 		}
 	}
 	return nil
+}
+
+var validID = regexp.MustCompile(`^[0-9a-fA-F]{24}$`)
+
+func IsValidObjectId(id string) bool {
+	return validID.MatchString(id)
+}
+
+func (s Status) Valid() bool {
+	switch s {
+	case StatusReady:
+		return true
+	case StatusDone:
+		return true
+	case StatusPending:
+		return true
+	case StatusApproved:
+		return true
+	case StatusRunning:
+		return true
+	case StatusFailed:
+		return true
+	case StatusParseOnly:
+		return true
+	default:
+		return false
+	}
 }

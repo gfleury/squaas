@@ -4,21 +4,22 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/gfleury/dbquerybench/models"
 	"io/ioutil"
 	"net/http"
-	// "net/url"
-	// "strings"
+	"strings"
 
 	check "gopkg.in/check.v1"
+
+	"github.com/gfleury/squaas/db"
+	"github.com/gfleury/squaas/models"
 )
 
 func (s *Suite) TestCreateQuery(c *check.C) {
 	query := &models.Query{
-		TicketID: "BLEH-330",
-		// Owner:    models.User{Name: "admin@boom.org"},
-		Query:      "SELECT * FROM TABLE;",
-		ServerName: "db1.blah.com",
+		TicketID:   "BLEH-330",
+		Query:      "SELECT * FROM XTABLE;",
+		ServerName: "server1",
+		Status:     models.StatusReady,
 	}
 
 	queryBytes, err := query.Byte()
@@ -38,13 +39,14 @@ func (s *Suite) TestCreateQuery(c *check.C) {
 	c.Assert(err, check.IsNil)
 
 	c.Assert(responseQuery.TicketID, check.Equals, query.TicketID)
-	c.Assert(responseQuery.Status, check.Equals, "pending")
+	c.Assert(responseQuery.Status, check.Equals, models.StatusReady)
 	c.Assert(responseQuery.Query, check.Equals, query.Query)
 	c.Assert(responseQuery.ServerName, check.Equals, query.ServerName)
+	c.Assert(responseQuery.Owner, check.Equals, models.User{Name: "admin"})
 
 	// Check GetQuery
 
-	req, _ = http.NewRequest("GET", fmt.Sprintf("/v1/query/%s", responseQuery.Id), nil)
+	req, _ = http.NewRequest("GET", fmt.Sprintf("/v1/query/%s", responseQuery.Id.Hex()), nil)
 	response = s.executeRequest(req)
 
 	c.Assert(response.Code, check.Equals, http.StatusOK)
@@ -56,15 +58,35 @@ func (s *Suite) TestCreateQuery(c *check.C) {
 	c.Assert(err, check.IsNil)
 
 	c.Assert(responseQuery.TicketID, check.Equals, query.TicketID)
-	c.Assert(responseQuery.Status, check.Equals, "pending")
+	c.Assert(responseQuery.Status, check.Equals, models.StatusReady)
 	c.Assert(responseQuery.Query, check.Equals, query.Query)
+	c.Assert(responseQuery.Owner, check.Equals, models.User{Name: "admin"})
+}
+
+func (s *Suite) TestCreateQueryInvalidStatus(c *check.C) {
+	query := &models.Query{
+		TicketID:   "BLEH-330",
+		Query:      "SELECT * FROM XTABLE;",
+		ServerName: "server1",
+		Status:     models.StatusApproved,
+	}
+
+	queryBytes, err := query.Byte()
+	c.Assert(err, check.IsNil)
+
+	req, _ := http.NewRequest("POST", "/v1/query", bytes.NewReader(queryBytes))
+	response := s.executeRequest(req)
+
+	c.Assert(response.Code, check.Equals, http.StatusBadRequest)
 
 }
 
 func (s *Suite) TestDeleteQuery(c *check.C) {
 	query := &models.Query{
-		TicketID: "pipelineDelete",
-		Query:    "SELECT * FROM TABLE;",
+		TicketID:   "pipelineDelete",
+		Query:      "SELECT * FROM XTABLE;",
+		ServerName: "server1",
+		Status:     models.StatusReady,
 	}
 
 	queryBytes, err := query.Byte()
@@ -75,21 +97,63 @@ func (s *Suite) TestDeleteQuery(c *check.C) {
 
 	c.Assert(response.Code, check.Equals, http.StatusOK)
 
-	req, _ = http.NewRequest("DELETE", fmt.Sprintf("/v1/query/%s", query.Id), nil)
+	err = query.Parse(response.Body)
+	c.Assert(err, check.IsNil)
+
+	req, _ = http.NewRequest("DELETE", fmt.Sprintf("/v1/query/%s", query.Id.Hex()), nil)
 	response = s.executeRequest(req)
 
 	c.Assert(response.Code, check.Equals, http.StatusOK)
 
-	req, _ = http.NewRequest("DELETE", fmt.Sprintf("/v1/query/%s", query.Id), nil)
+	req, _ = http.NewRequest("DELETE", fmt.Sprintf("/v1/query/%s", query.Id.Hex()), nil)
 	response = s.executeRequest(req)
 
 	c.Assert(response.Code, check.Equals, http.StatusNotFound)
 }
 
+func (s *Suite) TestDeleteQueryInvalidStatus(c *check.C) {
+	query := &models.Query{
+		TicketID:   "BLEH-330",
+		Query:      "SELECT * FROM XTABLE;",
+		ServerName: "server1",
+		Status:     models.StatusReady,
+	}
+
+	queryBytes, err := query.Byte()
+	c.Assert(err, check.IsNil)
+
+	req, _ := http.NewRequest("POST", "/v1/query", bytes.NewReader(queryBytes))
+	response := s.executeRequest(req)
+	c.Assert(response.Code, check.Equals, http.StatusOK)
+
+	var p []byte
+	p, err = ioutil.ReadAll(response.Body)
+	c.Assert(err, check.IsNil)
+
+	responseQuery := &models.Query{}
+	err = json.Unmarshal(p, responseQuery)
+	c.Assert(err, check.IsNil)
+
+	QueryDB := db.DBStorage.Connection().Model("Query")
+	err = QueryDB.FindId(responseQuery.Id).Exec(query)
+	c.Assert(err, check.IsNil)
+
+	query.Status = models.StatusApproved
+	err = query.Save()
+	c.Assert(err, check.IsNil)
+
+	req, _ = http.NewRequest("DELETE", fmt.Sprintf("/v1/query/%s", query.Id.Hex()), nil)
+	response = s.executeRequest(req)
+
+	c.Assert(response.Code, check.Equals, http.StatusBadRequest)
+}
+
 func (s *Suite) TestUpdateQuery(c *check.C) {
 	query := &models.Query{
-		TicketID: "pipelineUpdate",
-		Query:    "SELECT * FROM TABLE;",
+		TicketID:   "pipelineUpdate",
+		Query:      "SELECT * FROM XTABLE;",
+		ServerName: "server1",
+		Status:     models.StatusPending,
 	}
 
 	queryBytes, err := query.Byte()
@@ -108,9 +172,9 @@ func (s *Suite) TestUpdateQuery(c *check.C) {
 
 	err = json.Unmarshal(p, responseQuery)
 	c.Assert(err, check.IsNil)
-	// Update pipeline
+	// Update Query
 
-	responseQuery.Query = "SELECT * FROM TABLE2;"
+	responseQuery.Query = "SELECT * FROM TABLEXXX;"
 
 	queryBytes, err = responseQuery.Byte()
 	c.Assert(err, check.IsNil)
@@ -119,8 +183,8 @@ func (s *Suite) TestUpdateQuery(c *check.C) {
 
 	c.Assert(response.Code, check.Equals, http.StatusOK)
 
-	// Get Pipeline
-	req, _ = http.NewRequest("GET", fmt.Sprintf("/v1/query/%s", responseQuery.Id), nil)
+	// Get Query
+	req, _ = http.NewRequest("GET", fmt.Sprintf("/v1/query/%s", responseQuery.Id.Hex()), nil)
 	response = s.executeRequest(req)
 
 	c.Assert(response.Code, check.Equals, http.StatusOK)
@@ -136,4 +200,96 @@ func (s *Suite) TestUpdateQuery(c *check.C) {
 	c.Assert(responseQuery.Status, check.Equals, responseQueryNew.Status)
 	c.Assert(responseQuery.Owner, check.DeepEquals, responseQueryNew.Owner)
 	c.Assert(responseQuery.Query, check.DeepEquals, responseQueryNew.Query)
+}
+
+func (s *Suite) TestGetDatabases(c *check.C) {
+	req, _ := http.NewRequest("GET", "/v1/databases", nil)
+	response := s.executeRequest(req)
+
+	c.Assert(response.Code, check.Equals, http.StatusOK)
+
+	servers := &models.Servers{}
+
+	err := servers.Parse(response.Body)
+	c.Assert(err, check.IsNil)
+
+	c.Assert(len(*servers), check.Equals, 2)
+	c.Assert(*servers, check.DeepEquals, models.Servers{
+		{Name: "server1"},
+		{Name: "server2"},
+	})
+}
+
+func (s *Suite) TestApproveQuery(c *check.C) {
+
+	query := &models.Query{
+		TicketID:   "BLEH-330",
+		Query:      "SELECT * FROM XTABLE;",
+		ServerName: "server1",
+		Status:     models.StatusReady,
+	}
+
+	queryBytes, err := query.Byte()
+	c.Assert(err, check.IsNil)
+
+	req, _ := http.NewRequest("POST", "/v1/query", bytes.NewReader(queryBytes))
+	response := s.executeRequest(req)
+
+	c.Assert(response.Code, check.Equals, http.StatusOK)
+
+	var p []byte
+	p, err = ioutil.ReadAll(response.Body)
+	c.Assert(err, check.IsNil)
+
+	responseQuery := &models.Query{}
+	err = json.Unmarshal(p, responseQuery)
+	c.Assert(err, check.IsNil)
+
+	req, _ = http.NewRequest("POST", fmt.Sprintf("/v1/query/%s/approve", responseQuery.Id.Hex()), strings.NewReader("approved"))
+	response = s.executeRequest(req)
+
+	c.Assert(response.Code, check.Equals, http.StatusOK)
+
+	req, _ = http.NewRequest("GET", fmt.Sprintf("/v1/query/%s", responseQuery.Id.Hex()), nil)
+	response = s.executeRequest(req)
+
+	c.Assert(response.Code, check.Equals, http.StatusOK)
+
+	p, err = ioutil.ReadAll(response.Body)
+	c.Assert(err, check.IsNil)
+
+	responseQuery = &models.Query{}
+	err = json.Unmarshal(p, responseQuery)
+	c.Assert(err, check.IsNil)
+
+	c.Assert(responseQuery.TicketID, check.Equals, query.TicketID)
+	c.Assert(responseQuery.Status, check.Equals, models.StatusReady)
+	c.Assert(responseQuery.Query, check.Equals, query.Query)
+	c.Assert(responseQuery.ServerName, check.Equals, query.ServerName)
+	c.Assert(responseQuery.Owner, check.Equals, models.User{Name: "admin"})
+	c.Assert(responseQuery.Approvals, check.DeepEquals, []models.Approvals{{User: &models.User{Name: "admin"}, Approved: true}})
+
+	req, _ = http.NewRequest("DELETE", fmt.Sprintf("/v1/query/%s/approve", responseQuery.Id.Hex()), strings.NewReader("approved"))
+	response = s.executeRequest(req)
+
+	c.Assert(response.Code, check.Equals, http.StatusOK)
+
+	req, _ = http.NewRequest("GET", fmt.Sprintf("/v1/query/%s", responseQuery.Id.Hex()), nil)
+	response = s.executeRequest(req)
+
+	c.Assert(response.Code, check.Equals, http.StatusOK)
+
+	p, err = ioutil.ReadAll(response.Body)
+	c.Assert(err, check.IsNil)
+
+	responseQuery = &models.Query{}
+	err = json.Unmarshal(p, responseQuery)
+	c.Assert(err, check.IsNil)
+
+	c.Assert(responseQuery.TicketID, check.Equals, query.TicketID)
+	c.Assert(responseQuery.Status, check.Equals, models.StatusReady)
+	c.Assert(responseQuery.Query, check.Equals, query.Query)
+	c.Assert(responseQuery.ServerName, check.Equals, query.ServerName)
+	c.Assert(responseQuery.Owner, check.Equals, models.User{Name: "admin"})
+	c.Assert(responseQuery.Approvals, check.DeepEquals, []models.Approvals{{User: &models.User{Name: "admin"}, Approved: false}})
 }

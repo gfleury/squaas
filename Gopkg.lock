@@ -14,6 +14,12 @@
   version = "v1.4.7"
 
 [[projects]]
+  name = "github.com/gin-contrib/cors"
+  packages = ["."]
+  revision = "5f50d4fb4e0306dcacc6f8e9bea2dcee784dbbdf"
+  version = "v1.3.0"
+
+[[projects]]
   name = "github.com/gin-contrib/sse"
   packages = ["."]
   revision = "5545eab6dad3bbbd6c5ae9186383c2a9d23c0dae"
@@ -83,6 +89,16 @@
   version = "v0.1.0"
 
 [[projects]]
+  name = "github.com/lib/pq"
+  packages = [
+    ".",
+    "oid",
+    "scram"
+  ]
+  revision = "3427c32cb71afc948325f299f040e53c1dd78979"
+  version = "v1.2.0"
+
+[[projects]]
   name = "github.com/magiconair/properties"
   packages = ["."]
   revision = "de8848e004dd33dc07a2947b3d76f618a7fc7ef1"
@@ -123,12 +139,6 @@
   packages = ["."]
   revision = "ba968bfe8b2f7e042a574c888954fccecfa385b4"
   version = "v0.8.1"
-
-[[projects]]
-  name = "github.com/rs/cors"
-  packages = ["."]
-  revision = "db0fe48135e83b5812a5a31be0eea66984b1b521"
-  version = "v1.7.0"
 
 [[projects]]
   name = "github.com/spf13/afero"
@@ -251,6 +261,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "09fe6c7147f0d4cb8fc741f5fc054aac81ab78359753e09dc60620b54d726267"
+  inputs-digest = "909c6c228e85687bc87894567fa744966a501b02a4fd93a19fe4a3c6d8e01383"
   solver-name = "gps-cdcl"
   solver-version = 1

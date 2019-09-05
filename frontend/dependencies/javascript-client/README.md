@@ -95,19 +95,16 @@ Please follow the [installation](#installation) instruction and execute the foll
 ```javascript
 var DBqueryBench = require('d_bquery_bench');
 
-var api = new DBqueryBench.QueryApi()
-
-var body = new DBqueryBench.Query(); // {Query} Query that needs to be queued
-
+var api = new DBqueryBench.DatabasesApi()
 
 var callback = function(error, data, response) {
   if (error) {
     console.error(error);
   } else {
-    console.log('API called successfully.');
+    console.log('API called successfully. Returned data: ' + data);
   }
 };
-api.addQuery(body, callback);
+api.getDatabases(callback);
 
 ```
 
@@ -117,11 +114,14 @@ All URIs are relative to *https://dbqueryBench/v1*
 
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
+*DBqueryBench.DatabasesApi* | [**getDatabases**](docs/DatabasesApi.md#getDatabases) | **GET** /databases | Get list of databases
 *DBqueryBench.QueryApi* | [**addQuery**](docs/QueryApi.md#addQuery) | **POST** /query | Add a new query to the queue
 *DBqueryBench.QueryApi* | [**approveQuery**](docs/QueryApi.md#approveQuery) | **POST** /query/approve/{queryId} | Approve a query in the queue
-*DBqueryBench.QueryApi* | [**deleteQuery**](docs/QueryApi.md#deleteQuery) | **DELETE** /query/approve/{queryId} | Deletes a query
+*DBqueryBench.QueryApi* | [**deleteApprovalQuery**](docs/QueryApi.md#deleteApprovalQuery) | **DELETE** /query/approve/{queryId} | Deletes an approval of a query
+*DBqueryBench.QueryApi* | [**deleteQuery**](docs/QueryApi.md#deleteQuery) | **DELETE** /query/{queryId} | Deletes a query
 *DBqueryBench.QueryApi* | [**findQueryByOwner**](docs/QueryApi.md#findQueryByOwner) | **GET** /query/findByOwner | Finds Query by Owner
 *DBqueryBench.QueryApi* | [**findQueryByStatus**](docs/QueryApi.md#findQueryByStatus) | **GET** /query/findByStatus | Finds Query by status
+*DBqueryBench.QueryApi* | [**getQueries**](docs/QueryApi.md#getQueries) | **GET** /query | Get Query waiting for approval
 *DBqueryBench.QueryApi* | [**getQueryById**](docs/QueryApi.md#getQueryById) | **GET** /query/{queryId} | Find query by ID
 *DBqueryBench.QueryApi* | [**updateQuery**](docs/QueryApi.md#updateQuery) | **PUT** /query | Update an existing query
 
@@ -130,6 +130,7 @@ Class | Method | HTTP request | Description
 
  - [DBqueryBench.Query](docs/Query.md)
  - [DBqueryBench.QueryApprovals](docs/QueryApprovals.md)
+ - [DBqueryBench.Server](docs/Server.md)
  - [DBqueryBench.User](docs/User.md)
 
 

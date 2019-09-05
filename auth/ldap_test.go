@@ -4,7 +4,7 @@ import (
 	"encoding/base64"
 	"net/http"
 	"net/http/httptest"
-	// "github.com/gfleury/dbquerybench/config"
+	// "github.com/gfleury/squaas/config"
 
 	"github.com/gin-gonic/gin"
 	"gopkg.in/check.v1"

@@ -1,8 +1,13 @@
 language: go
 install: true
+services:
+  - mongodb
+  - postgresql
 go:
   - 1.10.x
   - master
+before_script:
+  - psql -c 'create database data;' -U postgres
 script:
   - 'make ${JOB}'
 env:
@@ -12,6 +17,8 @@ env:
     - JOB=test
     - JOB=race
     - JOB=default
+    - JOB=frontend/test
+    - JOB=frontend/build
 jobs:
   fast_finish: true
 after_success:

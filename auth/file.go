@@ -1,7 +1,7 @@
 package auth
 
 import (
-	"github.com/gfleury/dbquerybench/config"
+	"github.com/gfleury/squaas/config"
 	"github.com/gin-gonic/gin"
 )
 

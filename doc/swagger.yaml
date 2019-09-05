@@ -21,6 +21,49 @@ schemes:
 - "https"
 paths:
   /query:
+    get:
+      tags:
+      - "query"
+      summary: "Get Query waiting for approval"
+      operationId: "getQueries"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "owner"
+        in: "query"
+        description: "Owner to filter by"
+        required: false
+        type: "array"
+        items:
+          type: "string"
+        collectionFormat: "multi"
+        x-exportParamName: "Owner"
+      - name: "status"
+        in: "query"
+        description: "Status values that need to be considered for filter"
+        required: false
+        type: "array"
+        items:
+          type: "string"
+          default: "pending"
+          enum:
+          - "done"
+          - "pending"
+          - "approved"
+          - "failed"
+          - "running"
+        collectionFormat: "multi"
+        x-exportParamName: "Status"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Query"
+        400:
+          description: "Invalid tag value"
+
     post:
       tags:
       - "query"
@@ -157,6 +200,27 @@ paths:
           description: "Invalid ID supplied"
         404:
           description: "Query not found"
+    delete:
+      tags:
+      - "query"
+      summary: "Deletes a query"
+      description: ""
+      operationId: "deleteQuery"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "queryId"
+        in: "path"
+        description: "Query id to delete"
+        required: true
+        type: "integer"
+        format: "int64"
+        x-exportParamName: "QueryId"
+      responses:
+        400:
+          description: "Invalid ID supplied"
+        404:
+          description: "Query not found"
   /query/approve/{queryId}:
     post:
       tags:
@@ -196,9 +260,9 @@ paths:
     delete:
       tags:
       - "query"
-      summary: "Deletes a query"
+      summary: "Deletes an approval of a query"
       description: ""
-      operationId: "deleteQuery"
+      operationId: "deleteApprovalQuery"
       produces:
       - "application/json"
       parameters:
@@ -214,7 +278,34 @@ paths:
           description: "Invalid ID supplied"
         404:
           description: "Query not found"
+  /databases:
+    get:
+      tags:
+      - "databases"
+      summary: "Get list of databases"
+      operationId: "getDatabases"
+      produces:
+      - "application/json"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Server"
+        400:
+          description: "Invalid tag value"
 definitions:
+  Server:
+    type: "object"
+    required:
+    - "uri"
+    - "name"
+    properties:
+      name:
+        type: "string"
+      uri:
+        type: "string"
   User:
     type: "object"
     required:

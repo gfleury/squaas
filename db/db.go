@@ -7,8 +7,8 @@ package db
 import (
 	"log"
 
-	"github.com/gfleury/dbquerybench/config"
-	"github.com/gfleury/dbquerybench/models"
+	"github.com/gfleury/squaas/config"
+	"github.com/gfleury/squaas/models"
 
 	"github.com/zebresel-com/mongodm"
 	mgo "gopkg.in/mgo.v2"
@@ -24,7 +24,7 @@ func loadConfig() error {
 
 	mongoConnectionURL = config.GetConfig().GetString("mongo.url")
 	if mongoConnectionURL == "" {
-		mongoConnectionURL = "mongodb://127.0.0.1:27017/dbquerybench"
+		mongoConnectionURL = "mongodb://127.0.0.1:27017/squaas"
 	}
 
 	return nil
@@ -92,7 +92,7 @@ func (s *Storage) Init() error {
 	}
 
 	index = mgo.Index{
-		Key:        []string{"status", "owner", "ticketid"},
+		Key:        []string{"status", "owner", "ticketid", "approvals.user"},
 		Background: true,
 		Sparse:     true,
 	}

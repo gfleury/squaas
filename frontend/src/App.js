@@ -3,28 +3,49 @@ import React from 'react';
 import { BrowserRouter as Router, Route, Link } from "react-router-dom";
 import Grid from '@material-ui/core/Grid';
 
-import Edit from "./QueryEdit"
+import DBqueryBench from 'd_bquery_bench';
 
-import List from "./QueryList"
+import QueryList from "./QueryList";
+import QueryNew from "./QueryNew";
+import QueryEdit from "./QueryEdit"
 
 import './App.css';
 
+const isLocalhost = Boolean(
+  window.location.hostname === 'localhost' ||
+  // [::1] is the IPv6 localhost address.
+  window.location.hostname === '[::1]' ||
+  // 127.0.0.1/8 is considered localhost for IPv4.
+  window.location.hostname.match(
+    /^127(?:\.(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)){3}$/
+  )
+);
+
 function App() {
+  var api = new DBqueryBench.QueryApi();
+  var dbApi = new DBqueryBench.DatabasesApi();
+
+  api.apiClient.basePath = "http://localhost:8080/v1";
+  dbApi.apiClient.basePath = "http://localhost:8080/v1";
+
+  if (isLocalhost) {
+    api.apiClient.defaultHeaders = { "Authorization": "Basic YWRtaW46YWRtaW4=" }
+    dbApi.apiClient.defaultHeaders = { "Authorization": "Basic YWRtaW46YWRtaW4=" }
+  }
 
   return (
     <div className="App">
       <Router basename="/frontend">
         <Header />
         <Route exact path="/" component={Home} />
-        <Route path="/about" component={About} />
-        <Route path="/queries" component={Queries} />
-        <Route
-          path="/queries/:id"
-          component={Edit} />
-        <Route
-          exact
-          path="/queries"
-          component={List}
+        <Route exact path="/queries"
+          render={(props) => <QueryList api={api} {...props} />}
+        />
+        <Route path="/queries/new"
+          render={(props) => <QueryNew dbApi={dbApi} api={api} {...props} />}
+        />
+        <Route path="/queries/edit/:id"
+          render={(props) => <QueryEdit dbApi={dbApi} api={api} {...props} />}
         />
       </Router>
     </div >
@@ -35,20 +56,6 @@ function Home() {
   return <h2>Home</h2>;
 }
 
-function About() {
-  return <h2>About</h2>;
-}
-
-function Queries({ match }) {
-  return (
-    <Grid container spacing={3}>
-      <Grid item xs={12}>
-        <h2>Queries</h2>
-      </Grid>
-    </Grid>
-  );
-}
-
 function Header() {
   return (
     <Grid container spacing={3}>
@@ -56,10 +63,10 @@ function Header() {
         <Link to="/">Home</Link>
       </Grid>
       <Grid item xs>
-        <Link to="/about">About</Link>
+        <Link to="/queries">Queries</Link>
       </Grid>
       <Grid item xs>
-        <Link to="/queries">Queries</Link>
+        <Link to="/queries/new">Create Query</Link>
       </Grid>
     </Grid>
   );
