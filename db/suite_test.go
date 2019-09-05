@@ -38,6 +38,8 @@ func (s *S) TearDownTest(c *check.C) {
 }
 
 func (s *S) TearDownSuite(c *check.C) {
+	c.Assert(DBStorage.Connection(), check.NotNil)
+
 	err := DBStorage.Connection().Session.DB("squaastest").DropDatabase()
 	c.Check(err, check.IsNil)
 }

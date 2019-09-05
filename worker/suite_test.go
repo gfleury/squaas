@@ -33,6 +33,8 @@ databases:
 	c.Check(err, check.IsNil)
 }
 func (s *Suite) TearDownSuite(c *check.C) {
+	c.Assert(db.DBStorage.Connection(), check.NotNil)
+
 	err := db.DBStorage.Connection().Session.DB("squaastest").DropDatabase()
 	c.Check(err, check.IsNil)
 }

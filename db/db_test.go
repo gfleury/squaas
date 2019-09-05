@@ -8,7 +8,7 @@ func (s *S) TestStorageInit(c *check.C) {
 
 	err := DBStorage.Init()
 
-	c.Check(err, check.IsNil)
+	c.Assert(err, check.IsNil)
 
 	names, err := DBStorage.Connection().Session.DB("squaastest").CollectionNames()
 	c.Check(err, check.IsNil)
