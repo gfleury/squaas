@@ -43,13 +43,13 @@ func (s *Suite) SetUpTest(c *check.C) {
 		Query:  "SELECT * FROM XTABLE;",
 		Status: models.StatusReady,
 		Approvals: []models.Approvals{
-			{&models.User{Name: "admin"}, true},
-			{&models.User{Name: "admin"}, true},
-			{&models.User{Name: "admin"}, true},
-			{&models.User{Name: "admin"}, true},
-			{&models.User{Name: "admin"}, true},
-			{&models.User{Name: "admin"}, true},
-			{&models.User{Name: "admin"}, false},
+			{User: &models.User{Name: "admin"}, Approved: true},
+			{User: &models.User{Name: "admin"}, Approved: true},
+			{User: &models.User{Name: "admin"}, Approved: true},
+			{User: &models.User{Name: "admin"}, Approved: true},
+			{User: &models.User{Name: "admin"}, Approved: true},
+			{User: &models.User{Name: "admin"}, Approved: true},
+			{User: &models.User{Name: "admin"}, Approved: false},
 		},
 	}
 
@@ -65,13 +65,13 @@ func (s *Suite) SetUpTest(c *check.C) {
 		Query:  "SELECT * FROM XTABLE;",
 		Status: models.StatusReady,
 		Approvals: []models.Approvals{
-			{&models.User{Name: "admin"}, false},
-			{&models.User{Name: "admin"}, false},
-			{&models.User{Name: "admin"}, false},
-			{&models.User{Name: "admin"}, false},
-			{&models.User{Name: "admin"}, false},
-			{&models.User{Name: "admin"}, true},
-			{&models.User{Name: "admin"}, false},
+			{User: &models.User{Name: "admin"}, Approved: false},
+			{User: &models.User{Name: "admin"}, Approved: false},
+			{User: &models.User{Name: "admin"}, Approved: false},
+			{User: &models.User{Name: "admin"}, Approved: false},
+			{User: &models.User{Name: "admin"}, Approved: false},
+			{User: &models.User{Name: "admin"}, Approved: false},
+			{User: &models.User{Name: "admin"}, Approved: true},
 		},
 	}
 
