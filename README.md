@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/gfleury/squaas.svg?branch=master)](https://travis-ci.org/gfleury/squaas) [![codecov](https://codecov.io/gh/gfleury/squaas/branch/master/graph/badge.svg)](https://codecov.io/gh/squaas/squaas)
+[![Build Status](https://travis-ci.org/gfleury/squaas.svg?branch=master)](https://travis-ci.org/gfleury/squaas) [![codecov](https://codecov.io/gh/gfleury/squaas/branch/master/graph/badge.svg)](https://codecov.io/gh/gfleury/squaas)
 
 # SQUAAS
 
