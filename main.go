@@ -11,12 +11,12 @@ import (
 	"time"
 
 	"github.com/gfleury/squaas/api"
-	"github.com/gfleury/squaas/config"
+	_ "github.com/gfleury/squaas/config"
 	"github.com/gfleury/squaas/db"
+	_ "github.com/gfleury/squaas/ticket"
 )
 
 func main() {
-	config.Init()
 	db.InitStorage()
 	err := db.DBStorage.Init()
 	if err != nil {

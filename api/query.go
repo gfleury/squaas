@@ -14,6 +14,7 @@ import (
 
 	"github.com/gfleury/squaas/db"
 	"github.com/gfleury/squaas/models"
+	"github.com/gfleury/squaas/ticket"
 )
 
 func Index(c *gin.Context) {
@@ -45,9 +46,22 @@ func GetQueries(c *gin.Context) {
 func AddQuery(c *gin.Context) {
 	var query models.Query
 
+	ownerUser := c.MustGet(gin.AuthUserKey).(string)
+
 	err := c.BindJSON(&query)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	ticket, err := ticket.TicketServive.GetTicket(query.TicketID)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	if len(query.TicketID) < 1 && ticket.Valid(ownerUser) {
+		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("Invalid ticketID, not reporter/asignee or watcher")})
 		return
 	}
 
@@ -60,8 +74,6 @@ func AddQuery(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("Queries can only be created in Pending and Ready status, invalid status: %s", query.Status)})
 		return
 	}
-
-	ownerUser := c.MustGet(gin.AuthUserKey).(string)
 
 	query.Owner.Name = ownerUser
 
@@ -274,9 +286,22 @@ func GetQueryById(c *gin.Context) {
 func UpdateQuery(c *gin.Context) {
 	var queryUpdated, queryOriginal models.Query
 
+	requestingUser := c.MustGet(gin.AuthUserKey).(string)
+
 	err := c.BindJSON(&queryUpdated)
 	if err != nil {
 		c.JSON(http.StatusMethodNotAllowed, gin.H{"error": err.Error()})
+		return
+	}
+
+	ticket, err := ticket.TicketServive.GetTicket(queryUpdated.TicketID)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	if len(queryUpdated.TicketID) < 1 && ticket.Valid(requestingUser) {
+		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("Invalid ticketID, not reporter/asignee or watcher")})
 		return
 	}
 
@@ -288,8 +313,6 @@ func UpdateQuery(c *gin.Context) {
 		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
 		return
 	}
-
-	requestingUser := c.MustGet(gin.AuthUserKey).(string)
 
 	if requestingUser != queryOriginal.Owner.Name {
 		c.JSON(http.StatusForbidden, gin.H{"error": "You must have ownership to be able to update it"})

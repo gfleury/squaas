@@ -17,7 +17,6 @@ type S struct {
 var _ = check.Suite(&S{})
 
 func (s *S) SetUpSuite(c *check.C) {
-	config.Init()
 
 	var yamlExample = []byte(`
 mongo:
