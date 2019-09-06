@@ -25,8 +25,7 @@ import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
 import MoodBadIcon from '@material-ui/icons/MoodBad';
 import MoodIcon from '@material-ui/icons/Mood';
 
-
-
+import QueryModel from 'd_bquery_bench/src/model/Query';
 
 
 export default class QueryList extends React.Component {
@@ -168,7 +167,7 @@ export default class QueryList extends React.Component {
                                         <TableCell component="th" scope="row" align="center">
                                             {query.ticketid}
                                         </TableCell>
-                                        <TableCell align="center">{query.status}</TableCell>
+                                        <TableCell align="center">{QueryModel.StatusEnum[query.status]}</TableCell>
                                         <TableCell align="right">{query.owner.name}</TableCell>
                                         <TableCell align="right"><Moment fromNow>{query.updatedAt}</Moment></TableCell>
                                         <TableCell align="right">{this.getBehavior(query)}</TableCell>

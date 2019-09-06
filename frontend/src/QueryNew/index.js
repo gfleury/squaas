@@ -19,7 +19,8 @@ import CloseIcon from '@material-ui/icons/Close';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { atomDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 
-import DBqueryBench from 'd_bquery_bench';
+import QueryModel from 'd_bquery_bench/src/model/Query';
+
 
 export default class QueryNew extends React.Component {
     constructor(props) {
@@ -96,7 +97,7 @@ export default class QueryNew extends React.Component {
 
     handleParse(event) {
         var _this = this;
-        var query = new DBqueryBench.Query();
+        var query = new QueryModel();
 
         query.status = "PARSEONLY"
         query.query = this.state.query;
@@ -117,7 +118,7 @@ export default class QueryNew extends React.Component {
 
     handleSubmit(event) {
         var _this = this;
-        var query = new DBqueryBench.Query();
+        var query = new QueryModel();
 
         query.status = this.state.status;
         query.query = this.state.query;

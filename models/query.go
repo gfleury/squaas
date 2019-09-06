@@ -6,6 +6,7 @@ package models
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"regexp"
@@ -79,10 +80,8 @@ func (q *Query) Merge(eq *Query) (err error) {
 		q.Status = eq.Status
 	}
 
-	if q.Status == StatusReady {
-		if eq.Status == StatusPending {
-			q.Approvals = nil
-		}
+	if q.Status == StatusReady && eq.Status == StatusPending {
+		q.Approvals = nil
 		q.Status = eq.Status
 	}
 
@@ -133,6 +132,11 @@ func (q *Query) LintSQLQuery() error {
 			return err
 		}
 		switch stmt.(type) {
+		case *sqlparser.Update:
+			if stmt.(*sqlparser.Update).Where == nil {
+				return fmt.Errorf("No WHERE found for UPDATE")
+			}
+			q.HasUpdate = true
 		case *sqlparser.Select:
 			q.HasSelect = true
 		case *sqlparser.Insert:
@@ -145,6 +149,9 @@ func (q *Query) LintSQLQuery() error {
 				q.HasTransaction = true
 			}
 		case *sqlparser.Delete:
+			if stmt.(*sqlparser.Delete).Where == nil {
+				return fmt.Errorf("No WHERE found for DELETE")
+			}
 			q.HasDelete = true
 		case *sqlparser.DDL:
 			q.HasAlter = true
