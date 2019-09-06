@@ -43,7 +43,13 @@ func (w *BasicWorker) Run() {
 
 		if err != nil {
 			log.Printf("Failed to get data: %s", err.Error())
-			w.end()
+			w.end(true)
+			continue
+		}
+
+		// Just jump to the end if there is no data to process.
+		if len(dataArray) == 0 {
+			w.end(true)
 			continue
 		}
 
@@ -63,7 +69,7 @@ func (w *BasicWorker) Run() {
 		// Wait for all to finish
 		w.wg.Wait()
 
-		w.end()
+		w.end(false)
 	}
 }
 
@@ -71,9 +77,11 @@ func (w *BasicWorker) start() {
 	w.startTime = time.Now()
 }
 
-func (w *BasicWorker) end() {
+func (w *BasicWorker) end(emptyRun bool) {
 	w.lastRunTime = time.Since(w.startTime)
-	log.Printf("Worker run took %s", fmtDuration(w.lastRunTime))
+	if !emptyRun {
+		log.Printf("Worker run took %s", fmtDuration(w.lastRunTime))
+	}
 	time.Sleep(w.MinRunTime)
 }
 

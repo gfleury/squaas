@@ -8,7 +8,7 @@ import (
 
 var config *viper.Viper
 
-func Init() {
+func init() {
 	var err error
 	config = viper.New()
 	config.SetConfigType("yaml")

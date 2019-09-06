@@ -8,6 +8,7 @@ import (
 
 	"github.com/gfleury/squaas/config"
 	"github.com/gfleury/squaas/db"
+	_ "github.com/gfleury/squaas/ticket"
 
 	"github.com/gin-gonic/gin"
 	check "gopkg.in/check.v1"
@@ -18,7 +19,6 @@ type Suite struct {
 }
 
 func (s *Suite) SetUpSuite(c *check.C) {
-	config.Init()
 
 	s.router = NewRouter()
 	db.InitStorage()

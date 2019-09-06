@@ -202,30 +202,35 @@
    */
   exports.StatusEnum = {
     /**
+     * value: "ready"
+     * @const
+     */
+    "ready": "Ready",
+    /**
      * value: "done"
      * @const
      */
-    "done": "done",
+    "done": "Done",
     /**
      * value: "pending"
      * @const
      */
-    "pending": "pending",
+    "pending": "Pending",
     /**
      * value: "approved"
      * @const
      */
-    "approved": "approved",
+    "approved": "Approved",
     /**
      * value: "running"
      * @const
      */
-    "running": "running",
+    "running": "Running",
     /**
      * value: "failed"
      * @const
      */
-    "failed": "failed"
+    "failed": "Failed"
   };
 
 

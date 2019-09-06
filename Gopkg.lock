@@ -2,10 +2,22 @@
 
 
 [[projects]]
+  name = "github.com/andygrunwald/go-jira"
+  packages = ["."]
+  revision = "7966e7f5ed3e453362a4deac213c0e6cf7563f4c"
+  version = "v1.10.0"
+
+[[projects]]
   branch = "master"
   name = "github.com/bradleypeabody/godap"
   packages = ["."]
   revision = "c249933bc092493dd8f0d39a7254f3c2d6d28735"
+
+[[projects]]
+  name = "github.com/fatih/structs"
+  packages = ["."]
+  revision = "4966fc68f5b7593aafa6cbbba2d65ec6e1416047"
+  version = "v1.1.0"
 
 [[projects]]
   name = "github.com/fsnotify/fsnotify"
@@ -46,6 +58,12 @@
   packages = ["proto"]
   revision = "c823c79ea1570fb5ff454033735a8e68575d1d0f"
   version = "v1.3.0"
+
+[[projects]]
+  name = "github.com/google/go-querystring"
+  packages = ["query"]
+  revision = "44c6ddd0a2342c386950e880b658017258da92fc"
+  version = "v1.0.0"
 
 [[projects]]
   name = "github.com/hashicorp/hcl"
@@ -174,6 +192,15 @@
   version = "v1.4.0"
 
 [[projects]]
+  name = "github.com/trivago/tgo"
+  packages = [
+    "tcontainer",
+    "treflect"
+  ]
+  revision = "efdb64f40efe6e7cd3f50415710e7af6a7c316ad"
+  version = "v1.0.7"
+
+[[projects]]
   name = "github.com/ugorji/go"
   packages = ["codec"]
   revision = "2adff0894ba3bc2eeb9f9aea45fefd49802e1a13"
@@ -261,6 +288,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "909c6c228e85687bc87894567fa744966a501b02a4fd93a19fe4a3c6d8e01383"
+  inputs-digest = "22cce718d582228cc61b5d78a15812786ce6052a603c49caa677c77678913a33"
   solver-name = "gps-cdcl"
   solver-version = 1

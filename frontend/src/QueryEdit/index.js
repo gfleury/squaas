@@ -7,6 +7,7 @@ import TextField from '@material-ui/core/TextField';
 import Checkbox from '@material-ui/core/Checkbox';
 import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
+import Chip from '@material-ui/core/Chip';
 
 import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
@@ -18,11 +19,13 @@ import Input from '@material-ui/core/Input';
 import Snackbar from '@material-ui/core/Snackbar';
 import IconButton from '@material-ui/core/IconButton';
 import CloseIcon from '@material-ui/icons/Close';
+import MoodBadIcon from '@material-ui/icons/MoodBad';
+import MoodIcon from '@material-ui/icons/Mood';
 
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { atomDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 
-import DBqueryBench from 'd_bquery_bench';
+import QueryModel from 'd_bquery_bench/src/model/Query';
 
 
 export default class QueryEdit extends React.Component {
@@ -44,6 +47,8 @@ export default class QueryEdit extends React.Component {
             hasinsert: false,
             hasdelete: false,
             hasupdate: false,
+            result: {},
+            approvals: [],
         };
 
         this.handleChange = this.handleChange.bind(this);
@@ -51,6 +56,8 @@ export default class QueryEdit extends React.Component {
         this.handleSubmit = this.handleSubmit.bind(this);
         this.handleApprove = this.handleApprove.bind(this);
         this.handleDisapprove = this.handleDisapprove.bind(this);
+        this.getStatus = this.getStatus.bind(this);
+        this.getApprovals = this.getApprovals.bind(this);
     }
 
     classes = makeStyles(theme => ({
@@ -121,6 +128,8 @@ export default class QueryEdit extends React.Component {
                     hasinsert: data.hasinsert,
                     hasdelete: data.hasdelete,
                     hasupdate: data.hasupdate,
+                    approvals: data.approvals,
+                    result: data.result,
                 })
             }
         });
@@ -129,7 +138,7 @@ export default class QueryEdit extends React.Component {
 
     handleParse(event) {
         var _this = this;
-        var query = new DBqueryBench.Query();
+        var query = new QueryModel();
 
         query.status = "PARSEONLY"
         query.query = this.state.query;
@@ -180,7 +189,7 @@ export default class QueryEdit extends React.Component {
 
     handleSubmit(event) {
         var _this = this;
-        var query = new DBqueryBench.Query();
+        var query = new QueryModel();
 
         query.status = this.state.status;
         query.query = this.state.query;
@@ -198,6 +207,68 @@ export default class QueryEdit extends React.Component {
         });
         //console.log(this.state);
         event.preventDefault();
+    }
+
+    getStatus() {
+        if (this.state.status === 'failed' || this.state.status === 'done') {
+            return (<TextField
+                disabled
+                id="result"
+                name="result"
+                label="SQL Query Result"
+                multiline
+                value={this.state.result.status}
+                className={this.classes.textField}
+                onChange={this.handleChange}
+                margin="normal"
+                variant="outlined"
+                InputLabelProps={{
+                    shrink: true,
+                }}
+                fullWidth
+            />)
+        } else if (this.state.status === 'done') {
+            return (<TextField
+                disabled
+                id="result"
+                name="result"
+                label="SQL Query Result"
+                multiline
+                value={`Affected rows: ${this.state.result.affectedrows}`}
+                className={this.classes.textField}
+                onChange={this.handleChange}
+                margin="normal"
+                variant="outlined"
+                InputLabelProps={{
+                    shrink: true,
+                }}
+                fullWidth
+            />)
+        }
+
+        return (<></>)
+    }
+
+    getApprovals() {
+        var ret = (<></>)
+        this.state.approvals.map(approval => {
+            if (approval.approved) {
+                ret = (<><>{ret}</><Chip
+                    label={approval.user.name}
+                    size="small"
+                    color="primary"
+                    icon={<MoodIcon />} /></>)
+            } else {
+                ret = (<><>{ret}</><Chip
+                    label={approval.user.name}
+                    size="small"
+                    color="secondary"
+                    icon={<MoodBadIcon />} /></>)
+            }
+            return ret
+        }
+        )
+        return ret
     }
 
     render() {
@@ -227,6 +298,10 @@ export default class QueryEdit extends React.Component {
                                 onChange={this.handleChange}
                                 input={<Input name="status" id="status" />}
                             >
+                                <MenuItem value="done">Done</MenuItem>
+                                <MenuItem value="approved">Approved</MenuItem>
+                                <MenuItem value="failed">Failed</MenuItem>
+                                <MenuItem value="running">Running</MenuItem>
                                 <MenuItem value="pending">On Hold</MenuItem>
                                 <MenuItem value="ready">Ready</MenuItem>
                             </Select>
@@ -259,7 +334,7 @@ export default class QueryEdit extends React.Component {
                             variant="outlined"
                         />
                     </Grid>
-                    <Grid item xs={9}>
+                    <Grid item xs={6}>
 
                         <FormLabel component="legend">Query behaviors</FormLabel>
                         <FormControlLabel
@@ -331,6 +406,14 @@ export default class QueryEdit extends React.Component {
                             <FormHelperText>Select the database for running the query</FormHelperText>
                         </FormControl>
                     </Grid>
+                    <Grid item xs={3}>
+                        <FormControl component="fieldset" className={this.classes.formControl}>
+                            <FormLabel component="legend">Approvals</FormLabel>
+                            <div><br />
+                                {this.getApprovals()}
+                            </div>
+                        </FormControl>
+                    </Grid>
                     <Grid item xs={6}>
                         <TextField
                             required
@@ -359,6 +442,9 @@ export default class QueryEdit extends React.Component {
                             style={atomDark}
                             children={this.state.query}
                         />
+                    </Grid>
+                    <Grid item xs={12}>
+                        {this.getStatus()}
                     </Grid>
                     <Grid item xs>
                         <Button onClick={this.handleParse} variant="contained" className={this.classes.button}>

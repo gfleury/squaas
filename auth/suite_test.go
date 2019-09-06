@@ -26,7 +26,6 @@ func runLdapServer(ldapServer *godap.LDAPServer) {
 }
 
 func (s *S) SetUpSuite(c *check.C) {
-	config.Init()
 	var yamlExample = []byte(`
 auth:
   scheme: ldap
