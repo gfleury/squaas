@@ -5,6 +5,7 @@
 package main
 
 import (
+	"flag"
 	"github.com/gfleury/squaas/worker"
 	"log"
 	"net/http"
@@ -16,13 +17,38 @@ import (
 	_ "github.com/gfleury/squaas/ticket"
 )
 
+var web, workers, all bool
+
+func init() {
+	flag.BoolVar(&all, "all", true, "For running api+frontned+workers")
+	flag.BoolVar(&web, "web", false, "For running only api+frontned")
+	flag.BoolVar(&workers, "workers", false, "For running only the workers")
+}
+
 func main() {
+	flag.Parse()
+
+	if workers || web {
+		all = false
+	}
+
 	db.InitStorage()
 	err := db.DBStorage.Init()
 	if err != nil {
 		log.Fatal(err)
 	}
 
+	if workers || all {
+		startWorkers(all || web)
+	}
+
+	if web || all {
+		startWeb()
+	}
+
+}
+
+func startWorkers(all bool) {
 	log.Printf("Starting flow worker")
 	wFlow := worker.NewFlowWorker()
 	wFlow.BasicWorker.MaxThreads = 2
@@ -33,8 +59,14 @@ func main() {
 	w := worker.NewQueryWorker()
 	w.BasicWorker.MaxThreads = 2
 	w.BasicWorker.MinRunTime = 10 * time.Second
-	go w.Run()
+	if !all {
+		w.Run()
+	} else {
+		go w.Run()
+	}
+}
 
+func startWeb() {
 	router := api.NewRouter()
 
 	log.Printf("Starting server")
