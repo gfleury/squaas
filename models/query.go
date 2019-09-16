@@ -162,32 +162,32 @@ func (q *Query) LintSQLQuery() error {
 }
 
 func (q *Query) UpdateTicketFailed() error {
-	ticket, err := ticket.TicketServive.GetTicket(q.TicketID)
+	t, err := ticket.TicketServive.GetTicket(q.TicketID)
 	if err != nil {
 		return err
 	}
 
-	err = ticket.AddComment(fmt.Sprintf("Query Failed: %#v", q))
+	err = t.AddComment(fmt.Sprintf(ticket.TicketServive.GetCommentFormat(), "Query execution {color:red}FAILED{color}: \n", q.Result.Status, q.Id.Hex()))
 	return err
 }
 
 func (q *Query) UpdateTicketDone() error {
-	ticket, err := ticket.TicketServive.GetTicket(q.TicketID)
+	t, err := ticket.TicketServive.GetTicket(q.TicketID)
 	if err != nil {
 		return err
 	}
 
-	err = ticket.AddComment(fmt.Sprintf("Query Done: %#v", q))
+	err = t.AddComment(fmt.Sprintf(ticket.TicketServive.GetCommentFormat(), "Query executed with {color:green}SUCCESS{color}: \n Number of affected rows: \n", q.Result.AffectedRows, q.Id.Hex()))
 	return err
 }
 
 func (q *Query) UpdateTicketAdded() error {
-	ticket, err := ticket.TicketServive.GetTicket(q.TicketID)
+	t, err := ticket.TicketServive.GetTicket(q.TicketID)
 	if err != nil {
 		return err
 	}
 
-	err = ticket.AddComment(fmt.Sprintf("Query added: %#v", q))
+	err = t.AddComment(fmt.Sprintf(ticket.TicketServive.GetCommentFormat(), "Added query into querybench: \n", q.Query, q.Id.Hex()))
 	return err
 }
 

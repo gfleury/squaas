@@ -12,6 +12,7 @@ type Ticket interface {
 
 type TicketApi interface {
 	GetTicket(id string) (Ticket, error)
+	GetCommentFormat() string
 }
 
 var TicketServive TicketApi

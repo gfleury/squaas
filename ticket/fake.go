@@ -22,3 +22,7 @@ func (t *FakeTicket) AddComment(comment string) error {
 func (j *FakeApi) GetTicket(id string) (Ticket, error) {
 	return &FakeTicket{api: j}, nil
 }
+
+func (j *FakeApi) GetCommentFormat() string {
+	return "%s"
+}
