@@ -7,6 +7,7 @@ package models
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/gfleury/squaas/ticket"
 	"io"
 	"io/ioutil"
 	"regexp"
@@ -158,6 +159,36 @@ func (q *Query) LintSQLQuery() error {
 		}
 	}
 	return nil
+}
+
+func (q *Query) UpdateTicketFailed() error {
+	ticket, err := ticket.TicketServive.GetTicket(q.TicketID)
+	if err != nil {
+		return err
+	}
+
+	err = ticket.AddComment(fmt.Sprintf("Query Failed: %#v", q))
+	return err
+}
+
+func (q *Query) UpdateTicketDone() error {
+	ticket, err := ticket.TicketServive.GetTicket(q.TicketID)
+	if err != nil {
+		return err
+	}
+
+	err = ticket.AddComment(fmt.Sprintf("Query Done: %#v", q))
+	return err
+}
+
+func (q *Query) UpdateTicketAdded() error {
+	ticket, err := ticket.TicketServive.GetTicket(q.TicketID)
+	if err != nil {
+		return err
+	}
+
+	err = ticket.AddComment(fmt.Sprintf("Query added: %#v", q))
+	return err
 }
 
 var validID = regexp.MustCompile(`^[0-9a-fA-F]{24}$`)

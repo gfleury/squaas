@@ -93,7 +93,11 @@ func (w *QueryWorker) DataProcess(data interface{}) {
 		query.Result.Status = err.Error()
 		err = query.Save()
 		if err != nil {
-			log.Printf("QueryWorker: %s: Query save after run failure, failed. Query will remain in status 'Running'.", query.Id.Hex())
+			log.Printf("QueryWorker: %s: Query save after run failure, failed. Query will remain in status 'Running': %s", query.Id.Hex(), err.Error())
+		}
+		err = query.UpdateTicketFailed()
+		if err != nil {
+			log.Printf("QueryWorker: %s: Adding comment to ticket failed: %s", query.Id.Hex(), err.Error())
 		}
 		return
 	}
@@ -107,7 +111,10 @@ func (w *QueryWorker) DataProcess(data interface{}) {
 	query.Status = models.StatusDone
 	err = query.Save()
 	if err != nil {
-		log.Printf("QueryWorker: %s: Query deleting failed, not running. %s", query.Id.Hex(), err.Error())
-		return
+		log.Printf("QueryWorker: %s: Query save final step to 'Done' failed.  Query will remain in status 'Running': %s", query.Id.Hex(), err.Error())
+	}
+	err = query.UpdateTicketDone()
+	if err != nil {
+		log.Printf("QueryWorker: %s: Adding comment to ticket failed: %s", query.Id.Hex(), err.Error())
 	}
 }

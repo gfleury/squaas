@@ -67,3 +67,60 @@ func (s *Suite) TestModelSQLLintBrokenTransaction(c *check.C) {
 	c.Assert(q.HasUpdate, check.Equals, false)
 	c.Assert(q.HasTransaction, check.Equals, false)
 }
+
+func (s *Suite) TestStatus(c *check.C) {
+	st := StatusReady
+	c.Assert(st.Valid(), check.Equals, true)
+	st = "Wronglyz"
+	c.Assert(st.Valid(), check.Equals, false)
+}
+
+func (s *Suite) TestMongoHexId(c *check.C) {
+	st := "5d6900e11b4db412b3c5f7b1"
+	c.Assert(IsValidObjectId(st), check.Equals, true)
+	st = "Wronglyz"
+	c.Assert(IsValidObjectId(st), check.Equals, false)
+}
+
+func (s *Suite) TestQueryAddRepeatedApprovals(c *check.C) {
+	q := &Query{
+		TicketID: "BLAH-123",
+		Query:    "BEGIN; INSERT INTO a VALUES (1);INSERT INTO a VALUES (1);INSERT INTO a VALUES (1);",
+	}
+
+	q.AddApproval(&User{Name: "root"}, true)
+	q.AddApproval(&User{Name: "root"}, true)
+	q.AddApproval(&User{Name: "root"}, false)
+	q.AddApproval(&User{Name: "root"}, false)
+
+	c.Assert(len(q.Approvals), check.Equals, 1)
+}
+
+func (s *Suite) TestQueryAddDifferentApprovals(c *check.C) {
+	q := &Query{
+		TicketID: "BLAH-123",
+		Query:    "BEGIN; INSERT INTO a VALUES (1);INSERT INTO a VALUES (1);INSERT INTO a VALUES (1);",
+	}
+
+	q.AddApproval(&User{Name: "root"}, true)
+	q.AddApproval(&User{Name: "user1"}, true)
+	q.AddApproval(&User{Name: "user3"}, false)
+	q.AddApproval(&User{Name: "user9"}, false)
+
+	c.Assert(len(q.Approvals), check.Equals, 4)
+}
+
+func (s *Suite) TestQueryUpdateTicketWithComment(c *check.C) {
+	q := &Query{
+		TicketID: "BLAH-123",
+		Query:    "BEGIN; INSERT INTO a VALUES (1);INSERT INTO a VALUES (1);INSERT INTO a VALUES (1);",
+	}
+
+	err := q.UpdateTicketAdded()
+	c.Assert(err, check.IsNil)
+	err = q.UpdateTicketDone()
+	c.Assert(err, check.IsNil)
+	err = q.UpdateTicketFailed()
+	c.Assert(err, check.IsNil)
+
+}

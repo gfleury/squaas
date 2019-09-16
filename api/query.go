@@ -54,6 +54,27 @@ func AddQuery(c *gin.Context) {
 		return
 	}
 
+	log.Printf("AddQuery: Parsing query: %#v", query)
+
+	// Lint SQL
+	err = query.LintSQLQuery()
+	if err != nil {
+		c.JSON(http.StatusMethodNotAllowed, gin.H{"error": err.Error()})
+		return
+	}
+
+	// Return if only linting SQL
+	if query.Status == models.StatusParseOnly {
+		c.JSON(http.StatusOK, query)
+		return
+	}
+
+	// Ticket Validation
+	if query.TicketID == "" {
+		c.JSON(http.StatusMethodNotAllowed, gin.H{"error": "You must insert a ticketID to link your query to"})
+		return
+	}
+
 	ticket, err := ticket.TicketServive.GetTicket(query.TicketID)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -65,6 +86,7 @@ func AddQuery(c *gin.Context) {
 		return
 	}
 
+	// Status Validation
 	if !query.Status.Valid() {
 		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("Invalid status: %s", query.Status)})
 		return
@@ -77,31 +99,8 @@ func AddQuery(c *gin.Context) {
 
 	query.Owner.Name = ownerUser
 
-	log.Printf("Parsing query owner: %s\n", query.Owner)
-	log.Printf("Parsing query ticketID: %s\n", query.TicketID)
-	log.Printf("Parsing query status: %s\n", query.Status)
-	log.Printf("Parsing query serverName: %s\n", query.ServerName)
-	log.Printf("Parsing query query: %s\n", query.Query)
-
-	err = query.LintSQLQuery()
-	if err != nil {
-		c.JSON(http.StatusMethodNotAllowed, gin.H{"error": err.Error()})
-		return
-	}
-
-	if query.Status == models.StatusParseOnly {
-		c.JSON(http.StatusOK, query)
-		return
-	}
-
 	if query.ServerName == "" {
 		c.JSON(http.StatusMethodNotAllowed, gin.H{"error": "You must select a database"})
-		return
-	}
-
-	// Do Ticket Validation, TODO Check Ticket existence in JIRA
-	if query.TicketID == "" {
-		c.JSON(http.StatusMethodNotAllowed, gin.H{"error": "You must insert a ticketID to link your query to"})
 		return
 	}
 
@@ -124,10 +123,16 @@ func AddQuery(c *gin.Context) {
 	} else {
 		var errorString string
 		for _, err := range issues {
-			errorString = fmt.Sprintf("%sError: %s\n", errorString, err.Error())
+			errorString = fmt.Sprintf("%s Error: %s\n", errorString, err.Error())
 		}
 		c.JSON(http.StatusMethodNotAllowed, gin.H{"error": errorString})
 		return
+	}
+
+	// Ticket add Comment (silently fail(logging))
+	err = query.UpdateTicketAdded()
+	if err != nil {
+		log.Printf("Adding comment to ticket failed on query %#v: %s", query, err.Error())
 	}
 
 	c.JSON(http.StatusOK, query)
