@@ -132,9 +132,9 @@ func (q *Query) LintSQLQuery() error {
 		if err != nil {
 			return err
 		}
-		switch stmt.(type) {
+		switch stmt := stmt.(type) {
 		case *sqlparser.Update:
-			if stmt.(*sqlparser.Update).Where == nil {
+			if stmt.Where == nil {
 				return fmt.Errorf("No WHERE found for UPDATE")
 			}
 			q.HasUpdate = true
@@ -150,7 +150,7 @@ func (q *Query) LintSQLQuery() error {
 				q.HasTransaction = true
 			}
 		case *sqlparser.Delete:
-			if stmt.(*sqlparser.Delete).Where == nil {
+			if stmt.Where == nil {
 				return fmt.Errorf("No WHERE found for DELETE")
 			}
 			q.HasDelete = true
@@ -161,7 +161,7 @@ func (q *Query) LintSQLQuery() error {
 	return nil
 }
 
-func (q *Query) UpdateTicketFailed() error {
+func (q *Query) TicketCommentFailed() error {
 	t, err := ticket.TicketServive.GetTicket(q.TicketID)
 	if err != nil {
 		return err
@@ -171,7 +171,7 @@ func (q *Query) UpdateTicketFailed() error {
 	return err
 }
 
-func (q *Query) UpdateTicketDone() error {
+func (q *Query) TicketCommentDone() error {
 	t, err := ticket.TicketServive.GetTicket(q.TicketID)
 	if err != nil {
 		return err
@@ -181,7 +181,7 @@ func (q *Query) UpdateTicketDone() error {
 	return err
 }
 
-func (q *Query) UpdateTicketAdded() error {
+func (q *Query) TicketCommentAdded() error {
 	t, err := ticket.TicketServive.GetTicket(q.TicketID)
 	if err != nil {
 		return err

@@ -79,6 +79,74 @@ func (s *Suite) TestCreateQueryInvalidStatus(c *check.C) {
 
 	c.Assert(response.Code, check.Equals, http.StatusBadRequest)
 
+	query = &models.Query{
+		TicketID:   "BLEH-330",
+		Query:      "SELECT * FROM XTABLE;",
+		ServerName: "server1",
+		Status:     "fsfsfs",
+	}
+
+	queryBytes, err = query.Byte()
+	c.Assert(err, check.IsNil)
+
+	req, _ = http.NewRequest("POST", "/v1/query", bytes.NewReader(queryBytes))
+	response = s.executeRequest(req)
+
+	c.Assert(response.Code, check.Equals, http.StatusBadRequest)
+}
+
+func (s *Suite) TestLintQueryOnly(c *check.C) {
+	query := &models.Query{
+		TicketID:   "",
+		Query:      "SELECT * FROM XTABLE;",
+		ServerName: "",
+		Status:     models.StatusParseOnly,
+	}
+
+	queryBytes, err := query.Byte()
+	c.Assert(err, check.IsNil)
+
+	req, _ := http.NewRequest("POST", "/v1/query", bytes.NewReader(queryBytes))
+	response := s.executeRequest(req)
+
+	c.Assert(response.Code, check.Equals, http.StatusOK)
+
+}
+
+func (s *Suite) TestLintErrorQueryOnly(c *check.C) {
+	query := &models.Query{
+		TicketID:   "",
+		Query:      "WRONG SQL FROM NOWHERE TO XTABLE;",
+		ServerName: "",
+		Status:     models.StatusParseOnly,
+	}
+
+	queryBytes, err := query.Byte()
+	c.Assert(err, check.IsNil)
+
+	req, _ := http.NewRequest("POST", "/v1/query", bytes.NewReader(queryBytes))
+	response := s.executeRequest(req)
+
+	c.Assert(response.Code, check.Equals, http.StatusMethodNotAllowed)
+
+}
+
+func (s *Suite) TestAddQueryEmptyTicket(c *check.C) {
+	query := &models.Query{
+		TicketID:   "",
+		Query:      "SELECT * FROM XTABLE;",
+		ServerName: "",
+		Status:     models.StatusReady,
+	}
+
+	queryBytes, err := query.Byte()
+	c.Assert(err, check.IsNil)
+
+	req, _ := http.NewRequest("POST", "/v1/query", bytes.NewReader(queryBytes))
+	response := s.executeRequest(req)
+
+	c.Assert(response.Code, check.Equals, http.StatusMethodNotAllowed)
+
 }
 
 func (s *Suite) TestDeleteQuery(c *check.C) {

@@ -81,7 +81,7 @@ func AddQuery(c *gin.Context) {
 		return
 	}
 
-	if len(query.TicketID) < 1 && ticket.Valid(ownerUser) {
+	if len(query.TicketID) < 1 || !ticket.Valid(ownerUser) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("Invalid ticketID, not reporter/asignee or watcher")})
 		return
 	}
@@ -130,7 +130,7 @@ func AddQuery(c *gin.Context) {
 	}
 
 	// Ticket add Comment (silently fail(logging))
-	err = query.UpdateTicketAdded()
+	err = query.TicketCommentAdded()
 	if err != nil {
 		log.Printf("Adding comment to ticket failed on query %#v: %s", query, err.Error())
 	}

@@ -24,5 +24,5 @@ func (j *FakeApi) GetTicket(id string) (Ticket, error) {
 }
 
 func (j *FakeApi) GetCommentFormat() string {
-	return "%s"
+	return "%s %s %s"
 }
