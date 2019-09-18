@@ -20,6 +20,7 @@ import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { atomDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 
 import QueryModel from 'd_bquery_bench/src/model/Query';
+import StatusStepper from '../StatusStepper';
 
 
 export default class QueryNew extends React.Component {
@@ -144,6 +145,9 @@ export default class QueryNew extends React.Component {
         return (
             <form className={this.classes.container} onSubmit={this.handleSubmit} autoComplete="off" >
                 <Grid container spacing={3}>
+                    <Grid item xs={12}>
+                        <StatusStepper></StatusStepper>
+                    </Grid>
                     <Grid item xs={3}>
                         <TextField
                             required

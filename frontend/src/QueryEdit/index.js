@@ -26,6 +26,7 @@ import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { atomDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 
 import QueryModel from 'd_bquery_bench/src/model/Query';
+import StatusStepper from '../StatusStepper';
 
 
 export default class QueryEdit extends React.Component {
@@ -58,6 +59,8 @@ export default class QueryEdit extends React.Component {
         this.handleDisapprove = this.handleDisapprove.bind(this);
         this.getStatus = this.getStatus.bind(this);
         this.getApprovals = this.getApprovals.bind(this);
+        this.getButtons = this.getButtons.bind(this);
+        this.getStepper = this.getStepper.bind(this);
     }
 
     classes = makeStyles(theme => ({
@@ -209,6 +212,30 @@ export default class QueryEdit extends React.Component {
         event.preventDefault();
     }
 
+    getButtons() {
+        const parseButton = (<Button onClick={this.handleParse} variant="contained" className={this.classes.button}>PARSE</Button>);
+        let saveButton = (<Button type="submit" variant="contained" className={this.classes.button}>SAVE</Button>);
+        let approveButton = (<Button onClick={this.handleApprove} variant="contained" className={this.classes.button}>APPROVE</Button>);
+        let disaproveButton = (<Button onClick={this.handleDisapprove} variant="contained" className={this.classes.button}>DISAPROVE</Button>);
+
+        if (this.state.status !== 'pending' && this.state.status !== 'ready') {
+            saveButton = (<></>);
+        }
+
+        if (this.state.status === 'failed' || this.state.status === 'done') {
+            approveButton = (<></>);
+            disaproveButton = (<></>);
+        }
+
+        let ret = (<>
+            {parseButton}
+            {saveButton}
+            {approveButton}
+            {disaproveButton}
+        </>);
+        return ret;
+    }
+
     getStatus() {
         if (this.state.status === 'failed' || this.state.status === 'done') {
             return (<TextField
@@ -271,11 +298,22 @@ export default class QueryEdit extends React.Component {
         return ret
     }
 
+    getStepper() {
+        if (this.state.owner === '') {
+            return;
+        } else {
+            return (<StatusStepper status={this.state.status}></StatusStepper>);
+        }
+    }
+
     render() {
         return (
 
             <form className={this.classes.container} onSubmit={this.handleSubmit} autoComplete="off" >
                 <Grid container spacing={3}>
+                    <Grid item xs={12}>
+                        {this.getStepper()}
+                    </Grid>
                     <Grid item xs={6} sm={3}>
                         <TextField
                             disabled
@@ -294,6 +332,7 @@ export default class QueryEdit extends React.Component {
                             <InputLabel htmlFor="status">Query State</InputLabel>
                             <Select
                                 required
+                                disabled={this.state.status !== 'ready' && this.state.status !== 'pending'}
                                 value={this.state.status}
                                 onChange={this.handleChange}
                                 input={<Input name="status" id="status" />}
@@ -394,6 +433,7 @@ export default class QueryEdit extends React.Component {
                                 required
                                 value={this.state.server}
                                 onChange={this.handleChange}
+                                disabled={this.state.status !== 'ready' && this.state.status !== 'pending'}
                                 input={<Input name="server" id="server" />}
                             >
                                 <MenuItem value="">
@@ -447,18 +487,7 @@ export default class QueryEdit extends React.Component {
                         {this.getStatus()}
                     </Grid>
                     <Grid item xs>
-                        <Button onClick={this.handleParse} variant="contained" className={this.classes.button}>
-                            PARSE
-                </Button>
-                        <Button type="submit" variant="contained" className={this.classes.button}>
-                            SAVE
-                </Button>
-                        <Button onClick={this.handleApprove} variant="contained" className={this.classes.button}>
-                            APPROVE
-                </Button>
-                        <Button onClick={this.handleDisapprove} variant="contained" className={this.classes.button}>
-                            DISAPROVE
-                </Button>
+                        {this.getButtons()}
                     </Grid>
                 </Grid >
                 <Snackbar

@@ -82,3 +82,15 @@ func (j *JiraApi) GetTicket(id string) (Ticket, error) {
 	issue, _, err := j.client.Issue.Get(id, nil)
 	return &JiraTicket{api: j, issue: issue}, err
 }
+
+func (j *JiraApi) GetCommentFormat() string {
+	return `
+%s
+
+{code:sql}
+%s
+{code}
+
+Check it here: [%s]
+	`
+}

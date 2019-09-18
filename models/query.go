@@ -7,6 +7,7 @@ package models
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/gfleury/squaas/ticket"
 	"io"
 	"io/ioutil"
 	"regexp"
@@ -131,9 +132,9 @@ func (q *Query) LintSQLQuery() error {
 		if err != nil {
 			return err
 		}
-		switch stmt.(type) {
+		switch stmt := stmt.(type) {
 		case *sqlparser.Update:
-			if stmt.(*sqlparser.Update).Where == nil {
+			if stmt.Where == nil {
 				return fmt.Errorf("No WHERE found for UPDATE")
 			}
 			q.HasUpdate = true
@@ -149,7 +150,7 @@ func (q *Query) LintSQLQuery() error {
 				q.HasTransaction = true
 			}
 		case *sqlparser.Delete:
-			if stmt.(*sqlparser.Delete).Where == nil {
+			if stmt.Where == nil {
 				return fmt.Errorf("No WHERE found for DELETE")
 			}
 			q.HasDelete = true
@@ -158,6 +159,36 @@ func (q *Query) LintSQLQuery() error {
 		}
 	}
 	return nil
+}
+
+func (q *Query) TicketCommentFailed() error {
+	t, err := ticket.TicketServive.GetTicket(q.TicketID)
+	if err != nil {
+		return err
+	}
+
+	err = t.AddComment(fmt.Sprintf(ticket.TicketServive.GetCommentFormat(), "Query execution {color:red}FAILED{color}: \n", q.Result.Status, q.Id.Hex()))
+	return err
+}
+
+func (q *Query) TicketCommentDone() error {
+	t, err := ticket.TicketServive.GetTicket(q.TicketID)
+	if err != nil {
+		return err
+	}
+
+	err = t.AddComment(fmt.Sprintf(ticket.TicketServive.GetCommentFormat(), "Query executed with {color:green}SUCCESS{color}: \n Number of affected rows: \n", q.Result.AffectedRows, q.Id.Hex()))
+	return err
+}
+
+func (q *Query) TicketCommentAdded() error {
+	t, err := ticket.TicketServive.GetTicket(q.TicketID)
+	if err != nil {
+		return err
+	}
+
+	err = t.AddComment(fmt.Sprintf(ticket.TicketServive.GetCommentFormat(), "Added query into querybench: \n", q.Query, q.Id.Hex()))
+	return err
 }
 
 var validID = regexp.MustCompile(`^[0-9a-fA-F]{24}$`)
