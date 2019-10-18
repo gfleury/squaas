@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { BrowserRouter as Router, Route, Link } from "react-router-dom";
+import { HashRouter as Router, Route, Link } from "react-router-dom";
 import Grid from '@material-ui/core/Grid';
 
 import DBqueryBench from 'd_bquery_bench';
@@ -25,17 +25,19 @@ function App() {
   var api = new DBqueryBench.QueryApi();
   var dbApi = new DBqueryBench.DatabasesApi();
 
-  api.apiClient.basePath = "http://localhost:8080/v1";
-  dbApi.apiClient.basePath = "http://localhost:8080/v1";
+  api.apiClient.basePath = "/v1";
+  dbApi.apiClient.basePath = "/v1";
 
   if (isLocalhost) {
+    api.apiClient.basePath = "http://localhost:8080/v1";
+    dbApi.apiClient.basePath = "http://localhost:8080/v1";
     api.apiClient.defaultHeaders = { "Authorization": "Basic YWRtaW46YWRtaW4=" }
     dbApi.apiClient.defaultHeaders = { "Authorization": "Basic YWRtaW46YWRtaW4=" }
   }
 
   return (
     <div className="App">
-      <Router basename="/frontend">
+      <Router basename="/">
         <Header />
         <Route exact path="/" component={Home} />
         <Route exact path="/queries"

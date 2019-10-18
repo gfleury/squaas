@@ -3,6 +3,7 @@ package auth
 import (
 	"crypto/sha512"
 	"fmt"
+	"log"
 	"net/http"
 	"strconv"
 
@@ -66,6 +67,8 @@ func LdapBasicAuthForRealm(realm string) gin.HandlerFunc {
 				if err == nil {
 					found = true
 					pairs.addCredentialCache(username, password)
+				} else {
+					log.Printf("LDAP Authentication failed for user %s: %s", username, err.Error())
 				}
 			} else {
 				c.Header("X-Cached-Auth", "true")

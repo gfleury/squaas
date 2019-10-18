@@ -181,13 +181,13 @@ func (q *Query) TicketCommentDone() error {
 	return err
 }
 
-func (q *Query) TicketCommentAdded() error {
+func (q *Query) TicketCommentAdded(httpReferer string) error {
 	t, err := ticket.TicketServive.GetTicket(q.TicketID)
 	if err != nil {
 		return err
 	}
 
-	err = t.AddComment(fmt.Sprintf(ticket.TicketServive.GetCommentFormat(), "Added query into querybench: \n", q.Query, q.Id.Hex()))
+	err = t.AddComment(fmt.Sprintf(ticket.TicketServive.GetCommentFormat(), "Added query into querybench: \n", q.Query, httpReferer+"/frontend/#/queries/edit/"+q.Id.Hex()))
 	return err
 }
 
