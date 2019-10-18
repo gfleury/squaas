@@ -18,6 +18,8 @@ profile:
 clean:
 	rm -rf *.prof
 	go clean $(PKGS)
+	rm -rf frontend/node_modules
+	rm -rf frontend/build
 
 lint:
 	go get -u github.com/golangci/golangci-lint/cmd/golangci-lint
@@ -32,3 +34,6 @@ frontend/build:
 	cd frontend && \
 	npm install && \
 	npm run build
+
+docker:
+	docker build -t gfleury/squaas:latest .

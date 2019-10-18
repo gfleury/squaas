@@ -5,7 +5,7 @@
 package api
 
 import (
-	"fmt"
+	"net/http"
 	"strings"
 	"time"
 
@@ -53,13 +53,21 @@ func NewRouter() *gin.Engine {
 		baseAuth.Handle(route.Method, route.Pattern, route.HandlerFunc)
 	}
 
+	// HealthCheck, unauthorized endpoint
+	m.Handle(strings.ToUpper("Get"), "/ping", AppHealthCheck)
+
 	return m
 }
 
 func AppIndex(c *gin.Context) {
-	w := c.Writer
+	c.Redirect(http.StatusTemporaryRedirect, "/frontend")
+	c.Abort()
+}
 
-	fmt.Fprintf(w, "Hello World!")
+func AppHealthCheck(c *gin.Context) {
+	c.JSON(200, gin.H{
+		"status": "OK",
+	})
 }
 
 var routes = Routes{

@@ -9,6 +9,7 @@ import (
 	"github.com/gfleury/squaas/worker"
 	"log"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/gfleury/squaas/api"
@@ -67,8 +68,14 @@ func startWorkers(all bool) {
 }
 
 func startWeb() {
+	port := "8080"
+
+	if ok := os.Getenv("PORT"); len(ok) != 0 {
+		port = os.Getenv("PORT")
+	}
+
 	router := api.NewRouter()
 
 	log.Printf("Starting server")
-	log.Fatal(http.ListenAndServe(":8080", router))
+	log.Fatal(http.ListenAndServe(":"+port, router))
 }
