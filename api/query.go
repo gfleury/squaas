@@ -134,7 +134,7 @@ func AddQuery(c *gin.Context) {
 	hostURL := ""
 	pURL, err := url.Parse(c.Request.Referer())
 	if err == nil {
-		hostURL = pURL.Scheme + "//" + pURL.Host
+		hostURL = pURL.Scheme + "://" + pURL.Host
 	}
 	err = query.TicketCommentAdded(hostURL)
 	if err != nil {
