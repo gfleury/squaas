@@ -29,6 +29,8 @@ function App() {
   dbApi.apiClient.basePath = "/v1";
 
   if (isLocalhost) {
+    api.apiClient.basePath = "http://localhost:8080/v1";
+    dbApi.apiClient.basePath = "http://localhost:8080/v1";
     api.apiClient.defaultHeaders = { "Authorization": "Basic YWRtaW46YWRtaW4=" }
     dbApi.apiClient.defaultHeaders = { "Authorization": "Basic YWRtaW46YWRtaW4=" }
   }
