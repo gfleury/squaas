@@ -9,6 +9,7 @@ import (
 	"gopkg.in/mgo.v2/bson"
 	"log"
 	"net/http"
+	"net/url"
 
 	"github.com/gin-gonic/gin"
 
@@ -130,7 +131,12 @@ func AddQuery(c *gin.Context) {
 	}
 
 	// Ticket add Comment (silently fail(logging))
-	err = query.TicketCommentAdded()
+	hostURL := ""
+	pURL, err := url.Parse(c.Request.Referer())
+	if err == nil {
+		hostURL = pURL.Scheme + "//" + pURL.Host
+	}
+	err = query.TicketCommentAdded(hostURL)
 	if err != nil {
 		log.Printf("Adding comment to ticket failed on query %#v: %s", query, err.Error())
 	}
