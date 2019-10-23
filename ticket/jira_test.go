@@ -14,6 +14,8 @@ func (s *Suite) TestJiraValidGetTicket(c *check.C) {
 
 	c.Assert(t.Valid("cfortier"), check.Equals, true)
 
+	c.Assert(t.Valid("nobody"), check.Equals, false)
+
 	err = t.AddComment("Test")
 	c.Assert(err, check.ErrorMatches, "You do not have the permission to comment on this issue.: Request failed. Please analyze the request body for more details. Status code: 400")
 }

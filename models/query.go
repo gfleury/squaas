@@ -7,6 +7,7 @@ package models
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/gfleury/squaas/config"
 	"github.com/gfleury/squaas/ticket"
 	"io"
 	"io/ioutil"
@@ -162,26 +163,29 @@ func (q *Query) LintSQLQuery() error {
 }
 
 func (q *Query) TicketCommentFailed() error {
+	httpReferer := config.GetConfig().GetString("mainDomain")
 	t, err := ticket.TicketServive.GetTicket(q.TicketID)
 	if err != nil {
 		return err
 	}
 
-	err = t.AddComment(fmt.Sprintf(ticket.TicketServive.GetCommentFormat(), "Query execution {color:red}FAILED{color}: \n", q.Result.Status, q.Id.Hex()))
+	err = t.AddComment(fmt.Sprintf(ticket.TicketServive.GetCommentFormat(), "Query execution {color:red}FAILED{color}: \n", q.Result.Status, httpReferer+"/frontend/#/queries/edit/"+q.Id.Hex()))
 	return err
 }
 
 func (q *Query) TicketCommentDone() error {
+	httpReferer := config.GetConfig().GetString("mainDomain")
 	t, err := ticket.TicketServive.GetTicket(q.TicketID)
 	if err != nil {
 		return err
 	}
 
-	err = t.AddComment(fmt.Sprintf(ticket.TicketServive.GetCommentFormat(), "Query executed with {color:green}SUCCESS{color}: \n Number of affected rows: \n", q.Result.AffectedRows, q.Id.Hex()))
+	err = t.AddComment(fmt.Sprintf(ticket.TicketServive.GetCommentFormat(), "Query executed with {color:green}SUCCESS{color}: \n Number of affected rows: \n", q.Result.AffectedRows, httpReferer+"/frontend/#/queries/edit/"+q.Id.Hex()))
 	return err
 }
 
-func (q *Query) TicketCommentAdded(httpReferer string) error {
+func (q *Query) TicketCommentAdded() error {
+	httpReferer := config.GetConfig().GetString("mainDomain")
 	t, err := ticket.TicketServive.GetTicket(q.TicketID)
 	if err != nil {
 		return err
