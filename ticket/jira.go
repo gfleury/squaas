@@ -11,8 +11,9 @@ import (
 )
 
 type JiraTicket struct {
-	api   TicketApi
-	issue *jira.Issue
+	api      TicketApi
+	issue    *jira.Issue
+	watchers *[]jira.User
 }
 
 type JiraApi struct {
@@ -48,15 +49,15 @@ func (t *JiraTicket) Valid(username string) bool {
 	}
 
 	// Check if Creator or Assginee
-	if t.issue.Fields.Creator.Name == username {
+	if t.issue.Fields.Creator != nil && t.issue.Fields.Creator.Name == username {
 		return true
 	}
-	if t.issue.Fields.Assignee.Name == username {
+	if t.issue.Fields.Assignee != nil && t.issue.Fields.Assignee.Name == username {
 		return true
 	}
 
 	// Check if at least the watchers
-	for _, watcher := range t.issue.Fields.Watches.Watchers {
+	for _, watcher := range *t.watchers {
 		if watcher.Name == username {
 			return true
 		}
@@ -80,7 +81,13 @@ func (t *JiraTicket) Issue() *jira.Issue {
 
 func (j *JiraApi) GetTicket(id string) (Ticket, error) {
 	issue, _, err := j.client.Issue.Get(id, nil)
-	return &JiraTicket{api: j, issue: issue}, err
+	if err != nil {
+		return &JiraTicket{api: j, issue: nil, watchers: nil}, err
+	}
+
+	watchers, _, err := j.client.Issue.GetWatchers(id)
+
+	return &JiraTicket{api: j, issue: issue, watchers: watchers}, err
 }
 
 func (j *JiraApi) GetCommentFormat() string {

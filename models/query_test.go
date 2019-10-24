@@ -116,7 +116,7 @@ func (s *Suite) TestQueryUpdateTicketWithComment(c *check.C) {
 		Query:    "BEGIN; INSERT INTO a VALUES (1);INSERT INTO a VALUES (1);INSERT INTO a VALUES (1);",
 	}
 
-	err := q.TicketCommentAdded("")
+	err := q.TicketCommentAdded()
 	c.Assert(err, check.IsNil)
 	err = q.TicketCommentDone()
 	c.Assert(err, check.IsNil)
