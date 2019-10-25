@@ -237,7 +237,7 @@ export default class QueryEdit extends React.Component {
     }
 
     getStatus() {
-        if (this.state.status === 'failed' || this.state.status === 'done') {
+        if (this.state.status === 'failed') {
             return (<TextField
                 disabled
                 id="result"
@@ -261,7 +261,7 @@ export default class QueryEdit extends React.Component {
                 name="result"
                 label="SQL Query Result"
                 multiline
-                value={`Affected rows: ${this.state.result.affectedrows}`}
+                value={`Affected rows: ${this.state.result.affectedrows}\n${this.state.result.status}`}
                 className={this.classes.textField}
                 onChange={this.handleChange}
                 margin="normal"
