@@ -102,6 +102,11 @@ func (s *Storage) Init() error {
 }
 
 func (s *Storage) Connection() *mongodm.Connection {
+	err := s.db.Session.Ping()
+	if err != nil {
+		log.Printf("Ping failed, trying to reconnect, previous error: %s", err.Error())
+		s.db.Session.Refresh()
+	}
 	return s.db
 }
 
