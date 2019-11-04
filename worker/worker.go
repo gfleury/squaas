@@ -53,12 +53,15 @@ func (w *BasicWorker) Run() {
 			continue
 		}
 
-		for idx, data := range dataArray {
-			if idx >= w.MaxThreads {
-				break
+		shouldRunCount := w.MaxThreads
+		for _, data := range dataArray {
+			if shouldRunCount <= 0 {
+				w.wg.Wait()
+				shouldRunCount = w.MaxThreads
 			}
 
 			w.wg.Add(1)
+			shouldRunCount--
 
 			go func(data interface{}) {
 				w.DataProcess(data)
