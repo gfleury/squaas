@@ -2,10 +2,11 @@ package worker
 
 import (
 	"fmt"
-	"log"
 	"sync"
 	"sync/atomic"
 	"time"
+
+	"github.com/gfleury/squaas/log"
 )
 
 type BasicWorker struct {

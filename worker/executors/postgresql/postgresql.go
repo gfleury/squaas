@@ -2,7 +2,8 @@ package postgresql
 
 import (
 	"database/sql"
-	"log"
+
+	"github.com/gfleury/squaas/log"
 
 	_ "github.com/lib/pq"
 )

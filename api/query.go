@@ -7,12 +7,12 @@ package api
 import (
 	"fmt"
 	"gopkg.in/mgo.v2/bson"
-	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 
 	"github.com/gfleury/squaas/db"
+	"github.com/gfleury/squaas/log"
 	"github.com/gfleury/squaas/models"
 	"github.com/gfleury/squaas/ticket"
 )

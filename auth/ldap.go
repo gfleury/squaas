@@ -3,9 +3,10 @@ package auth
 import (
 	"crypto/sha512"
 	"fmt"
-	"log"
 	"net/http"
 	"strconv"
+
+	"github.com/gfleury/squaas/log"
 
 	"github.com/gin-gonic/gin"
 )

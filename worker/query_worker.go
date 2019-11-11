@@ -3,9 +3,9 @@ package worker
 import (
 	"database/sql"
 	"gopkg.in/mgo.v2/bson"
-	"log"
 
 	"github.com/gfleury/squaas/db"
+	"github.com/gfleury/squaas/log"
 	"github.com/gfleury/squaas/models"
 	"github.com/gfleury/squaas/worker/executors/postgresql"
 )

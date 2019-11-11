@@ -5,9 +5,8 @@
 package db
 
 import (
-	"log"
-
 	"github.com/gfleury/squaas/config"
+	"github.com/gfleury/squaas/log"
 	"github.com/gfleury/squaas/models"
 
 	"github.com/zebresel-com/mongodm"

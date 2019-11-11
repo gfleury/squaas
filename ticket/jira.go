@@ -1,13 +1,13 @@
 package ticket
 
 import (
-	"log"
 	"net/http"
 	"strings"
 
 	"github.com/andygrunwald/go-jira"
 
 	"github.com/gfleury/squaas/config"
+	"github.com/gfleury/squaas/log"
 )
 
 type JiraTicket struct {

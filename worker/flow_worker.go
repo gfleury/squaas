@@ -2,10 +2,10 @@ package worker
 
 import (
 	"gopkg.in/mgo.v2/bson"
-	"log"
 
 	"github.com/gfleury/squaas/config"
 	"github.com/gfleury/squaas/db"
+	"github.com/gfleury/squaas/log"
 	"github.com/gfleury/squaas/models"
 )
 
