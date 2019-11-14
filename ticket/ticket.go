@@ -2,7 +2,7 @@ package ticket
 
 import (
 	"github.com/gfleury/squaas/config"
-	"log"
+	"github.com/gfleury/squaas/log"
 )
 
 type Ticket interface {

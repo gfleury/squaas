@@ -6,8 +6,8 @@ package main
 
 import (
 	"flag"
+	"github.com/gfleury/squaas/log"
 	"github.com/gfleury/squaas/worker"
-	"log"
 	"net/http"
 	"os"
 	"time"

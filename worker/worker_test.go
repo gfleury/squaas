@@ -52,7 +52,7 @@ func (s *Suite) TestBasicWorker(c *check.C) {
 	w.BasicWorker.DataProcess = w.DataProcess
 
 	go w.Run()
-	time.Sleep(2 * time.Second)
+	time.Sleep(5 * time.Second)
 	w.ShouldStop.Set(true)
 
 	w.m.Lock()
@@ -61,5 +61,5 @@ func (s *Suite) TestBasicWorker(c *check.C) {
 	})
 	w.m.Unlock()
 
-	c.Assert(w.processedData, check.DeepEquals, []string{"one", "two"})
+	c.Assert(w.processedData, check.DeepEquals, []string{"five", "four", "one", "three", "two"})
 }

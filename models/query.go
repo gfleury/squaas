@@ -169,7 +169,7 @@ func (q *Query) TicketCommentFailed() error {
 		return err
 	}
 
-	err = t.AddComment(fmt.Sprintf(ticket.TicketServive.GetCommentFormat(), "Query execution {color:red}FAILED{color}: \n", q.Result.Status, httpReferer+"/frontend/#/queries/edit/"+q.Id.Hex()))
+	err = t.AddComment(fmt.Sprintf(ticket.TicketServive.GetCommentFormat(), fmt.Sprintf("Query execution on %s {color:red}FAILED{color}: \n", q.ServerName), q.Result.Status, httpReferer+"/frontend/#/queries/edit/"+q.Id.Hex()))
 	return err
 }
 
@@ -180,7 +180,7 @@ func (q *Query) TicketCommentDone() error {
 		return err
 	}
 
-	err = t.AddComment(fmt.Sprintf(ticket.TicketServive.GetCommentFormat(), "Query executed with {color:green}SUCCESS{color}: \n Number of affected rows: \n", q.Result.AffectedRows, httpReferer+"/frontend/#/queries/edit/"+q.Id.Hex()))
+	err = t.AddComment(fmt.Sprintf(ticket.TicketServive.GetCommentFormat(), fmt.Sprintf("Query executed on %s with {color:green}SUCCESS{color}: \n Number of affected rows: \n", q.ServerName), q.Result.AffectedRows, httpReferer+"/frontend/#/queries/edit/"+q.Id.Hex()))
 	return err
 }
 
@@ -191,7 +191,7 @@ func (q *Query) TicketCommentAdded() error {
 		return err
 	}
 
-	err = t.AddComment(fmt.Sprintf(ticket.TicketServive.GetCommentFormat(), "Added query into querybench: \n", q.Query, httpReferer+"/frontend/#/queries/edit/"+q.Id.Hex()))
+	err = t.AddComment(fmt.Sprintf(ticket.TicketServive.GetCommentFormat(), fmt.Sprintf("Added query into querybench, to run at %s: \n", q.ServerName), q.Query, httpReferer+"/frontend/#/queries/edit/"+q.Id.Hex()))
 	return err
 }
 

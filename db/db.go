@@ -5,9 +5,8 @@
 package db
 
 import (
-	"log"
-
 	"github.com/gfleury/squaas/config"
+	"github.com/gfleury/squaas/log"
 	"github.com/gfleury/squaas/models"
 
 	"github.com/zebresel-com/mongodm"
@@ -102,6 +101,11 @@ func (s *Storage) Init() error {
 }
 
 func (s *Storage) Connection() *mongodm.Connection {
+	err := s.db.Session.Ping()
+	if err != nil {
+		log.Printf("Ping failed, trying to reconnect, previous error: %s", err.Error())
+		s.db.Session.Refresh()
+	}
 	return s.db
 }
 
