@@ -28,7 +28,21 @@ func GetQueries(c *gin.Context) {
 
 	QueryDB := db.DBStorage.Connection().Model("Query")
 
-	err := QueryDB.Find(bson.M{"deleted": false}).Exec(&queries)
+	mgoQuery := bson.M{"deleted": false}
+
+	if queryStatus := c.Query("status"); queryStatus != "" {
+		mgoQuery["status"] = queryStatus
+	}
+
+	if queryOwner := c.Query("owner"); queryOwner != "" {
+		mgoQuery["owner"] = &models.User{Name: queryOwner}
+	}
+
+	if queryTicketID := c.Query("ticketid"); queryTicketID != "" {
+		mgoQuery["ticketid"] = queryTicketID
+	}
+
+	err := QueryDB.Find(mgoQuery).Exec(&queries)
 
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
