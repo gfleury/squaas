@@ -124,3 +124,14 @@ func (s *Suite) TestQueryUpdateTicketWithComment(c *check.C) {
 	c.Assert(err, check.IsNil)
 
 }
+
+func (s *Suite) TestQueryWithWITH(c *check.C) {
+	q := &Query{
+		TicketID: "BLAH-123",
+		Query:    "WITH whenz as (select now()) select *, 1+1 from whenz;",
+	}
+
+	err := q.LintSQLQuery()
+	c.Assert(err, check.IsNil)
+
+}

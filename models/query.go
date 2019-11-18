@@ -12,9 +12,12 @@ import (
 	"io"
 	"io/ioutil"
 	"regexp"
-	"strings"
+	// "strings"
 
-	"github.com/xwb1989/sqlparser"
+	// "github.com/xwb1989/sqlparser"
+	// "github.com/vitessio/vitess/go/vt/sqlparser"
+	sqlparser "github.com/lfittl/pg_query_go"
+	nodes "github.com/lfittl/pg_query_go/nodes"
 	"github.com/zebresel-com/mongodm"
 )
 
@@ -123,39 +126,35 @@ func (q *Query) LintSQLQuery() error {
 
 	hasBegin := false
 
-	r := strings.NewReader(q.Query)
-	tokens := sqlparser.NewTokenizer(r)
-	for {
-		stmt, err := sqlparser.ParseNext(tokens)
-		if err == io.EOF {
-			break
-		}
-		if err != nil {
-			return err
-		}
-		switch stmt := stmt.(type) {
-		case *sqlparser.Update:
-			if stmt.Where == nil {
+	tree, err := sqlparser.Parse(q.Query)
+	if err != nil {
+		return err
+	}
+
+	for _, stmt := range tree.Statements {
+
+		switch stmt := stmt.(nodes.RawStmt).Stmt.(type) {
+		case nodes.UpdateStmt:
+			if stmt.WhereClause == nil {
 				return fmt.Errorf("No WHERE found for UPDATE")
 			}
 			q.HasUpdate = true
-		case *sqlparser.Select:
+		case nodes.SelectStmt:
 			q.HasSelect = true
-		case *sqlparser.Insert:
+		case nodes.InsertStmt:
 			q.HasInsert = true
-		case *sqlparser.Begin:
-			hasBegin = true
-		case *sqlparser.Rollback:
-		case *sqlparser.Commit:
-			if hasBegin {
+		case nodes.TransactionStmt:
+			if stmt.Kind == nodes.TRANS_STMT_BEGIN {
+				hasBegin = true
+			} else if hasBegin && stmt.Kind == nodes.TRANS_STMT_COMMIT {
 				q.HasTransaction = true
 			}
-		case *sqlparser.Delete:
-			if stmt.Where == nil {
+		case nodes.DeleteStmt:
+			if stmt.WhereClause == nil {
 				return fmt.Errorf("No WHERE found for DELETE")
 			}
 			q.HasDelete = true
-		case *sqlparser.DDL:
+		case nodes.CreateStmt:
 			q.HasAlter = true
 		}
 	}

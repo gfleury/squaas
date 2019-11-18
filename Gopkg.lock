@@ -107,6 +107,16 @@
   version = "v0.1.0"
 
 [[projects]]
+  name = "github.com/lfittl/pg_query_go"
+  packages = [
+    ".",
+    "nodes",
+    "parser"
+  ]
+  revision = "dfcaf527490fbd116d6fed73380bc2c338db2362"
+  version = "v1.0.0"
+
+[[projects]]
   name = "github.com/lib/pq"
   packages = [
     ".",
@@ -288,6 +298,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "22cce718d582228cc61b5d78a15812786ce6052a603c49caa677c77678913a33"
+  inputs-digest = "a17eb8a373836b8d09e7594cb2972f3497ab35d0c5adc8736a33645b11cb925f"
   solver-name = "gps-cdcl"
   solver-version = 1
