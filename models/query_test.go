@@ -135,3 +135,41 @@ func (s *Suite) TestQueryWithWITH(c *check.C) {
 	c.Assert(err, check.IsNil)
 
 }
+
+func (s *Suite) TestQueryWithError(c *check.C) {
+	q := &Query{
+		TicketID: "BLAH-123",
+		Query:    "SELECT What; This was pasted wrongly; ",
+	}
+
+	err := q.LintSQLQuery()
+	c.Assert(err, check.ErrorMatches, "syntax error at or near \"This\"")
+
+}
+
+func (s *Suite) TestQueryWithMultipleErrors(c *check.C) {
+	q := &Query{
+		TicketID: "BLAH-123",
+		Query:    "SELECT What; SELECT 1+1; INSERT INTO a VALUES (1);INSERT INTO a VALUES (1);INSERT INTO a VALUES (1); UPDATE was pasted wrongly; -- salve ",
+	}
+
+	err := q.LintSQLQuery()
+	c.Assert(err, check.ErrorMatches, "syntax error at or near \"wrongly\"")
+
+}
+
+func (s *Suite) TestQueryWithMultipleQueryMixedTypes(c *check.C) {
+	q := &Query{
+		TicketID: "BLAH-123",
+		Query:    "SELECT What; SELECT 1+1; INSERT INTO a VALUES (1);INSERT INTO a VALUES (1);INSERT INTO a VALUES (1);COMMIT; -- heinnn",
+	}
+
+	err := q.LintSQLQuery()
+	c.Assert(err, check.IsNil)
+
+	c.Assert(q.HasSelect, check.Equals, true)
+	c.Assert(q.HasDelete, check.Equals, false)
+	c.Assert(q.HasInsert, check.Equals, true)
+	c.Assert(q.HasUpdate, check.Equals, false)
+
+}
