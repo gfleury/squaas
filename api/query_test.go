@@ -361,3 +361,141 @@ func (s *Suite) TestApproveQuery(c *check.C) {
 	c.Assert(responseQuery.Owner, check.Equals, models.User{Name: "admin"})
 	c.Assert(responseQuery.Approvals, check.DeepEquals, []models.Approvals{{User: &models.User{Name: "admin"}, Approved: false}})
 }
+
+func (s *Suite) TestCreateQueryWithStatus(c *check.C) {
+	query := &models.Query{
+		TicketID:   "STATUSCHECK-330",
+		Query:      "SELECT * FROM XTABLE;",
+		ServerName: "server1",
+		Status:     models.StatusReady,
+	}
+
+	queryBytes, err := query.Byte()
+	c.Assert(err, check.IsNil)
+
+	req, _ := http.NewRequest("POST", "/v1/query", bytes.NewReader(queryBytes))
+	response := s.executeRequest(req)
+
+	c.Assert(response.Code, check.Equals, http.StatusOK)
+
+	var p []byte
+	p, err = ioutil.ReadAll(response.Body)
+	c.Assert(err, check.IsNil)
+
+	responseQuery := &models.Query{}
+	err = json.Unmarshal(p, responseQuery)
+	c.Assert(err, check.IsNil)
+
+	c.Assert(responseQuery.TicketID, check.Equals, query.TicketID)
+	c.Assert(responseQuery.Status, check.Equals, models.StatusReady)
+	c.Assert(responseQuery.Query, check.Equals, query.Query)
+	c.Assert(responseQuery.ServerName, check.Equals, query.ServerName)
+	c.Assert(responseQuery.Owner, check.Equals, models.User{Name: "admin"})
+
+	// Check GetQuery With Status
+
+	req, _ = http.NewRequest("GET", fmt.Sprintf("/v1/query?status=ready&ticketid=STATUSCHECK-330"), nil)
+	response = s.executeRequest(req)
+
+	c.Assert(response.Code, check.Equals, http.StatusOK)
+
+	p, err = ioutil.ReadAll(response.Body)
+	c.Assert(err, check.IsNil)
+
+	responseQueries := []models.Query{}
+
+	err = json.Unmarshal(p, &responseQueries)
+	c.Assert(err, check.IsNil)
+
+	c.Assert(len(responseQueries), check.Equals, 1)
+
+	c.Assert(responseQueries[0].TicketID, check.Equals, query.TicketID)
+	c.Assert(responseQueries[0].Status, check.Equals, models.StatusReady)
+	c.Assert(responseQueries[0].Query, check.Equals, query.Query)
+	c.Assert(responseQueries[0].Owner, check.Equals, models.User{Name: "admin"})
+
+	// Check GetQuery With Wrong Status
+
+	req, _ = http.NewRequest("GET", fmt.Sprintf("/v1/query?status=pending"), nil)
+	response = s.executeRequest(req)
+
+	c.Assert(response.Code, check.Equals, http.StatusOK)
+
+	p, err = ioutil.ReadAll(response.Body)
+	c.Assert(err, check.IsNil)
+
+	err = json.Unmarshal(p, &responseQueries)
+	c.Assert(err, check.IsNil)
+
+	c.Assert(len(responseQueries), check.Equals, 0)
+
+}
+
+func (s *Suite) TestCreateQueryWithOwner(c *check.C) {
+	query := &models.Query{
+		TicketID:   "OWNERTEST-330",
+		Query:      "SELECT * FROM XTABLE;",
+		ServerName: "server1",
+		Status:     models.StatusReady,
+	}
+
+	queryBytes, err := query.Byte()
+	c.Assert(err, check.IsNil)
+
+	req, _ := http.NewRequest("POST", "/v1/query", bytes.NewReader(queryBytes))
+	response := s.executeRequest(req)
+
+	c.Assert(response.Code, check.Equals, http.StatusOK)
+
+	var p []byte
+	p, err = ioutil.ReadAll(response.Body)
+	c.Assert(err, check.IsNil)
+
+	responseQuery := &models.Query{}
+	err = json.Unmarshal(p, responseQuery)
+	c.Assert(err, check.IsNil)
+
+	c.Assert(responseQuery.TicketID, check.Equals, query.TicketID)
+	c.Assert(responseQuery.Status, check.Equals, models.StatusReady)
+	c.Assert(responseQuery.Query, check.Equals, query.Query)
+	c.Assert(responseQuery.ServerName, check.Equals, query.ServerName)
+	c.Assert(responseQuery.Owner, check.Equals, models.User{Name: "admin"})
+
+	// Check GetQuery With Owner
+
+	req, _ = http.NewRequest("GET", fmt.Sprintf("/v1/query?owner=admin&ticketid=OWNERTEST-330"), nil)
+	response = s.executeRequest(req)
+
+	c.Assert(response.Code, check.Equals, http.StatusOK)
+
+	p, err = ioutil.ReadAll(response.Body)
+	c.Assert(err, check.IsNil)
+
+	responseQueries := []models.Query{}
+
+	err = json.Unmarshal(p, &responseQueries)
+	c.Assert(err, check.IsNil)
+
+	c.Assert(len(responseQueries), check.Equals, 1)
+
+	c.Assert(responseQueries[0].TicketID, check.Equals, query.TicketID)
+	c.Assert(responseQueries[0].Status, check.Equals, models.StatusReady)
+	c.Assert(responseQueries[0].Query, check.Equals, query.Query)
+	c.Assert(responseQueries[0].Owner, check.Equals, models.User{Name: "admin"})
+
+	// Check GetQuery With Wrong Owner
+
+	req, _ = http.NewRequest("GET", fmt.Sprintf("/v1/query?owner=wolverine"), nil)
+	response = s.executeRequest(req)
+
+	c.Assert(response.Code, check.Equals, http.StatusOK)
+
+	p, err = ioutil.ReadAll(response.Body)
+	c.Assert(err, check.IsNil)
+
+	err = json.Unmarshal(p, &responseQueries)
+	c.Assert(err, check.IsNil)
+
+	c.Assert(len(responseQueries), check.Equals, 0)
+
+}

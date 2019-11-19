@@ -12,6 +12,11 @@ import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';
 import Chip from '@material-ui/core/Chip';
 
+import TextField from '@material-ui/core/TextField';
+import MenuItem from '@material-ui/core/MenuItem';
+import Select from '@material-ui/core/Select';
+import Input from '@material-ui/core/Input';
+import FormControl from '@material-ui/core/FormControl';
 
 import Moment from 'react-moment';
 
@@ -29,6 +34,17 @@ import QueryModel from 'd_bquery_bench/src/model/Query';
 
 
 export default class QueryList extends React.Component {
+    constructor(props) {
+        super(props);
+
+        this.state = {
+            queries: [],
+            status: "ready",
+        }
+
+        this.handleChange = this.handleChange.bind(this);
+
+    }
 
     classes = makeStyles(theme => ({
         root: {
@@ -39,23 +55,18 @@ export default class QueryList extends React.Component {
         table: {
             minWidth: 650,
         },
+        formControl: {
+            margin: theme.spacing(1),
+            minWidth: 120,
+        },
+        textField: {
+            marginLeft: theme.spacing(1),
+            marginRight: theme.spacing(1),
+        },
     }));
 
-    state = {
-        queries: [],
-    }
-
     componentDidMount() {
-        var _this = this;
-        this.props.api.getQueries({}, function (error, data) {
-            if (error) {
-                console.error(error);
-            } else {
-                console.log('API called successfully.');
-                console.log(data);
-                _this.setState({ queries: data })
-            }
-        });
+        this.search(this.state.status)
     }
 
     getBehavior(query) {
@@ -135,6 +146,101 @@ export default class QueryList extends React.Component {
         )
     }
 
+    search(status) {
+        var _this = this;
+        this.props.api.getQueries(
+            {
+                status: [status],
+                ticketid: [this.state.ticketid],
+                owner: [this.state.owner]
+            },
+            function (error, data) {
+                if (error) {
+                    console.error(error);
+                } else {
+                    console.log('API called successfully.');
+                    console.log(data);
+                    _this.setState({ queries: data })
+                }
+            });
+    }
+
+    handleChange(event) {
+        if (event.target.name === "ticketid") {
+            event.target.value = event.target.value.toUpperCase();
+        }
+        let change = {};
+        change[event.target.name] = event.target.value;
+
+        this.setState(change);
+        if (event.target.name === "status") {
+            this.search(event.target.value)
+        }
+    }
+
+    searchBar() {
+        return (
+            <TableRow key="header">
+                <TableCell align="left">Search</TableCell>
+                <TableCell align="center">
+                    <TextField
+                        id="ticketid"
+                        name="ticketid"
+                        label="Ticket ID"
+                        className={this.classes.textField}
+                        value={this.state.ticketid}
+                        onChange={this.handleChange}
+                        margin="normal"
+                        variant="outlined"
+                        onKeyPress={event => {
+                            if (event.key === 'Enter') {
+                                this.search(this.state.status)
+                            }
+                        }}
+                    />
+                </TableCell>
+                <TableCell align="center">
+                    <FormControl className={this.classes.formControl}>
+                        <Select
+                            required
+                            value={this.state.status}
+                            onChange={this.handleChange}
+                            input={<Input name="status" id="status" />}
+                        >
+                            <MenuItem value="pending">On Hold</MenuItem>
+                            <MenuItem value="ready">Ready</MenuItem>
+                            <MenuItem value="done">Done</MenuItem>
+                            <MenuItem value="approved">Approved</MenuItem>
+                            <MenuItem value="running">Running</MenuItem>
+                            <MenuItem value="failed">Failed</MenuItem>
+                        </Select>
+                    </FormControl>
+                </TableCell>
+                <TableCell align="right">
+                    <TextField
+                        id="owner"
+                        name="owner"
+                        label="Owner"
+                        className={this.classes.textField}
+                        value={this.state.owner}
+                        onChange={this.handleChange}
+                        margin="normal"
+                        variant="outlined"
+                        onKeyPress={event => {
+                            if (event.key === 'Enter') {
+                                this.search(this.state.status)
+                            }
+                        }}
+                    />
+                </TableCell>
+                <TableCell align="right"></TableCell>
+                <TableCell align="right"></TableCell>
+                <TableCell align="right"></TableCell>
+                <TableCell align="right"></TableCell>
+            </TableRow>
+        )
+    }
+
     render() {
 
 
@@ -143,6 +249,7 @@ export default class QueryList extends React.Component {
                 <Paper className={this.classes.root}>
                     <Table className={this.classes.table}>
                         <TableHead>
+                            {this.searchBar()}
                             <TableRow key="header">
                                 <TableCell align="left"></TableCell>
                                 <TableCell align="center">Ticket ID</TableCell>

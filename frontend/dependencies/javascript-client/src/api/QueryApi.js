@@ -377,6 +377,14 @@
           value: opts['status'],
           collectionFormat: 'multi'
         },
+        'servername': {
+          value: opts['servername'],
+          collectionFormat: 'multi'
+        },
+        'ticketid': {
+          value: opts['ticketid'],
+          collectionFormat: 'multi'
+        },
       };
       var headerParams = {
       };
