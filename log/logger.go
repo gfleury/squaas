@@ -7,7 +7,7 @@ import (
 )
 
 func Printf(format string, v ...interface{}) {
-	fmt.Printf(fmt.Sprintf("[INFO] %v | %s",
+	fmt.Printf(fmt.Sprintf("[INFO] %v | %s\n",
 		time.Now().Format("2006/01/02 - 15:04:05"), format), v)
 }
 
