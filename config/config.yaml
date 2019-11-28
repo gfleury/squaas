@@ -8,6 +8,14 @@ databases:
   db.test.com: "postgresql://postgres@localhost:5432/blehws?sslmode=disable"
   db.staging.test.com: "postgresql://localhost:5424/blehws"
   db-test: "postgresql://127.0.0.1:5424/blehws"
+  db-long-config:
+    uri: "postgresql://127.0.0.245:5493/long-config"
+    approval_rule:
+      required_users:
+        - "test-user@blah.net"
+        - "admin@blah.net"
+      min_approved: 3
+      max_disapproved: 1
 flow:
-  minApproved: 1
-  maxDisapproved: 5
+  min_approved: 1
+  max_disapproved: 5

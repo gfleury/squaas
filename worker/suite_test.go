@@ -21,6 +21,14 @@ mongo:
 databases:
   broken: "postgres://postgres@localhost:1025/data?sslmode=disable"
   good: "postgres://postgres@localhost/data?sslmode=disable"
+  extendedgood: 
+    uri: "postgres://postgres@localhost/data?sslmode=disable"
+    approval_rule:
+      required_users:
+        - "test-user@blah.net"
+        - "admin@blah.net"
+      min_approved: 3
+      max_disapproved: 1
 `)
 
 	err := config.GetConfig().ReadConfig(bytes.NewBuffer(yamlExample))

@@ -12,17 +12,27 @@ package models
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"sort"
 
 	"github.com/gfleury/squaas/config"
+	"github.com/gfleury/squaas/log"
 )
+
+type ApprovalRule struct {
+	RequiredUsers  []string `json:"required_users" bson:"required_users"`
+	MinApproved    int      `json:"min_approved" bson:"min_approved"`
+	MaxDisapproved int      `json:"max_approved" bson:"max_approved"`
+}
 
 type Server struct {
 	Name string `json:"name" bson:"name"`
 
 	Uri string `json:"uri,omitempty" bson:"uri"`
+
+	ApprovalRule *ApprovalRule `json:"approval_rule,omitempty" bson:"approval_rule"`
 
 	FailedRetries int
 
@@ -62,13 +72,57 @@ func (u *Server) Parse(bodyReader io.Reader) error {
 }
 
 func GetDatabases(allData bool) Servers {
-	databases := config.GetConfig().GetStringMapString("databases")
+	databases := config.GetConfig().GetStringMap("databases")
 	servers := Servers{}
 
 	for server := range databases {
 		database := Server{Name: server}
 		if allData {
-			database.Uri = databases[server]
+			switch v := databases[server].(type) {
+			case string:
+				database.Uri = databases[server].(string)
+			case map[string]interface{}:
+				approvalRuleValue, ok := v["approval_rule"]
+				if ok {
+					approvalRule, ok := approvalRuleValue.(map[string]interface{})
+					if ok {
+						database.ApprovalRule = &ApprovalRule{
+							MinApproved:    -1,
+							MaxDisapproved: -1,
+						}
+						requiredUsers := config.GetConfig().GetStringSlice(fmt.Sprintf("databases.%s.approval_rule.required_users", server))
+						if ok {
+							database.ApprovalRule.RequiredUsers = make([]string, len(requiredUsers))
+							for idx, requiredUser := range requiredUsers {
+								database.ApprovalRule.RequiredUsers[idx] = requiredUser
+							}
+						}
+						minApproved, ok := approvalRule["min_approved"].(int)
+						if ok {
+							database.ApprovalRule.MinApproved = minApproved
+						}
+						maxApproved, ok := approvalRule["max_disapproved"].(int)
+						if ok {
+							database.ApprovalRule.MaxDisapproved = maxApproved
+						}
+					} else {
+						log.Printf("Configuration problem on databases section, approval_rule on %s, discarding this entry.", server)
+						continue
+					}
+				}
+
+				database.Uri, ok = v["uri"].(string)
+				if !ok {
+					log.Printf("Configuration problem on databases section, %s, discarding this entry.", server)
+					continue
+				}
+			}
+
+			if database.Uri == "" {
+				log.Printf("Configuration problem on databases section, no URI present, %s, discarding this entry.", server)
+				continue
+			}
+
 		}
 		servers = append(servers, database)
 	}

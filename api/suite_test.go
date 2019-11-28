@@ -26,7 +26,7 @@ func (s *Suite) SetUpSuite(c *check.C) {
 	c.Assert(err, check.IsNil)
 
 	// Database config used for tests
-	config.GetConfig().Set("databases", map[string]string{
+	config.GetConfig().Set("databases", map[string]interface{}{
 		"server1": "postgresql://localhost:34992/database2",
 		"server2": "postgresql://caixaprego:93939/database333",
 	})
