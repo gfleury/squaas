@@ -47,18 +47,41 @@ func GetReadyQueries() (queries []*aggregatedQueries, err error) {
 				},
 			}}).All(&queries)
 
-	if err != nil {
-		return
-	}
-
 	return
 }
 
 func (q *aggregatedQueries) ShouldBeApproved() bool {
 	minApproved := config.GetConfig().GetInt("flow.minApproved")
 	maxDisapproved := config.GetConfig().GetInt("flow.maxDisapproved")
+	requiredUser := true
 
-	return q.GoodApprovals >= minApproved && (len(q.Query.Approvals)-q.GoodApprovals) < maxDisapproved
+	databases := models.GetDatabases(true)
+
+	for _, database := range databases {
+		if database.Name == q.Query.ServerName && database.ApprovalRule != nil {
+			if database.ApprovalRule.MinApproved > 0 {
+				minApproved = database.ApprovalRule.MinApproved
+			}
+			if database.ApprovalRule.MaxDisapproved > 0 {
+				maxDisapproved = database.ApprovalRule.MaxDisapproved
+			}
+			if len(database.ApprovalRule.RequiredUsers) > 0 {
+				requiredUser = false
+
+			OUTER:
+				for _, user := range database.ApprovalRule.RequiredUsers {
+					for _, approvals := range q.Query.Approvals {
+						if approvals.User.Name == user {
+							requiredUser = true
+							break OUTER
+						}
+					}
+				}
+			}
+		}
+	}
+
+	return q.GoodApprovals >= minApproved && (len(q.Query.Approvals)-q.GoodApprovals) < maxDisapproved && requiredUser
 }
 
 func NewFlowWorker() *FlowWorker {

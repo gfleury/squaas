@@ -93,3 +93,65 @@ func (s *Suite) DropQueryFlow(c *check.C) {
 	_, err := db.DBStorage.Connection().Model("Query").RemoveAll(bson.M{})
 	c.Assert(err, check.IsNil)
 }
+
+func (s *Suite) TestShouldBeApprovedExtended(c *check.C) {
+	query := &models.Query{
+		Query:      "SELECT * FROM XTABLE;",
+		Status:     models.StatusReady,
+		ServerName: "extendedgood",
+		Approvals: []models.Approvals{
+			{User: &models.User{Name: "test-user@blah.net"}, Approved: true},
+			{User: &models.User{Name: "admin"}, Approved: true},
+			{User: &models.User{Name: "admin"}, Approved: true},
+		},
+	}
+
+	QueryDB := db.DBStorage.Connection().Model("Query")
+
+	err, _ := QueryDB.New(query)
+	c.Assert(err, check.IsNil)
+
+	err = query.Save()
+	c.Assert(err, check.IsNil)
+
+	queries, err := GetReadyQueries()
+	c.Assert(err, check.IsNil)
+
+	for _, q := range queries {
+		c.Assert(q.ShouldBeApproved(), check.Equals, true)
+	}
+
+	_, err = db.DBStorage.Connection().Model("Query").RemoveAll(bson.M{})
+	c.Assert(err, check.IsNil)
+}
+
+func (s *Suite) TestShouldNotBeApprovedExtended(c *check.C) {
+	query := &models.Query{
+		Query:      "SELECT * FROM XTABLE;",
+		Status:     models.StatusReady,
+		ServerName: "extendedgood",
+		Approvals: []models.Approvals{
+			{User: &models.User{Name: "admin-que"}, Approved: true},
+			{User: &models.User{Name: "admin"}, Approved: true},
+			{User: &models.User{Name: "admin"}, Approved: true},
+		},
+	}
+
+	QueryDB := db.DBStorage.Connection().Model("Query")
+
+	err, _ := QueryDB.New(query)
+	c.Assert(err, check.IsNil)
+
+	err = query.Save()
+	c.Assert(err, check.IsNil)
+
+	queries, err := GetReadyQueries()
+	c.Assert(err, check.IsNil)
+
+	for _, q := range queries {
+		c.Assert(q.ShouldBeApproved(), check.Equals, false)
+	}
+
+	_, err = db.DBStorage.Connection().Model("Query").RemoveAll(bson.M{})
+	c.Assert(err, check.IsNil)
+}
