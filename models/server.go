@@ -41,6 +41,29 @@ type Server struct {
 
 type Servers []Server
 
+type serverMetrics struct {
+	LastErrors []string
+}
+
+func (s serverMetrics) AddError(err string) {
+	s.LastErrors = append(s.LastErrors, err)
+}
+
+type ServersMetrics map[string]serverMetrics
+
+var DBMetrics ServersMetrics
+
+func (db ServersMetrics) Get(server string) (sm serverMetrics) {
+	if sm, ok := db[server]; !ok {
+		if db == nil {
+			db = make(map[string]serverMetrics)
+		}
+		sm = serverMetrics{}
+		db[server] = sm
+	}
+	return sm
+}
+
 func (u *Server) Byte() (objBytes []byte, err error) {
 	return json.Marshal(u)
 }
@@ -76,7 +99,11 @@ func GetDatabases(allData bool) Servers {
 	servers := Servers{}
 
 	for server := range databases {
-		database := Server{Name: server}
+		database := Server{
+			Name:          server,
+			LastErrors:    DBMetrics.Get(server).LastErrors,
+			FailedRetries: len(DBMetrics.Get(server).LastErrors),
+		}
 		if allData {
 			switch v := databases[server].(type) {
 			case string:

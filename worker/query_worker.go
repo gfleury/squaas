@@ -65,12 +65,14 @@ func (w *QueryWorker) DataProcess(data interface{}) {
 	err := executor.Init()
 
 	if err != nil {
+		models.DBMetrics.Get(query.ServerName).AddError(err.Error())
 		log.Printf("QueryWorker: %s: Database connection initialization failed, not running. %s", query.Id.Hex(), err.Error())
 		return
 	}
 
 	err = executor.SetData(query.Query)
 	if err != nil {
+		models.DBMetrics.Get(query.ServerName).AddError(err.Error())
 		log.Printf("QueryWorker: %s: Database parameter initialization failed, not running. %s", query.Id.Hex(), err.Error())
 		return
 	}
